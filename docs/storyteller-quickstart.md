@@ -27,6 +27,7 @@ Claude will automatically route to storyteller when it detects presentation-rela
 | **Word** | Technical documentation, proposals | `docs/*.docx` |
 | **Excel** | Metrics dashboards, data analysis | `docs/*.xlsx` |
 | **PDF** | Final deliverables, archival | `docs/*.pdf` |
+| **Video** | Social sharing, loops | `docs/*.mp4` |
 
 ## Example Prompts
 
@@ -48,6 +49,11 @@ Claude will automatically route to storyteller when it detects presentation-rela
 **Technical doc:**
 ```
 @stories:storyteller Write a Word document explaining our API architecture
+```
+
+**Video presentation:**
+```
+@stories:storyteller Create a video presentation about our new mobile app launch
 ```
 
 ## Workflow
@@ -75,6 +81,7 @@ Every presentation follows this narrative arc:
 - **Mention key points** you want emphasized
 - **Reference context** - PRs, repos, or sessions the agent should research
 - **Request a format** explicitly if you don't want HTML
+- **Optional QA:** Add "with QA" or "run QA" to your request to get a Playwright screenshot pass (overflow, SVG overlaps, emoji rendering, scaling). (Playwright may be installed if needed.)
 
 ## Quick Reference
 

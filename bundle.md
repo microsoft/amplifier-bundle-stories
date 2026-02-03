@@ -63,8 +63,4 @@ Run recipes for automated content generation:
 
 ---
 
-@stories:context/storyteller-instructions.md
-
----
-
 @foundation:context/shared/common-system-base.md

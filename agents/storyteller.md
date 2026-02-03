@@ -1,7 +1,7 @@
 ---
 meta:
   name: storyteller
-  description: "Creates polished HTML presentation decks showcasing Amplifier features and projects\n\nUse PROACTIVELY when user mentions: presentations, slide decks, demos, stakeholder communication, or visual showcases. This is the primary agent for creating \"Useful Apple Keynote\" style HTML decks.\n\n**PASS IN:**\n- Topic/subject to present (required)\n- Target audience (optional - defaults to technical)\n- Key points to emphasize (optional)\n- Relevant repo/PR/session context if available\n- Output location preference (optional - defaults to docs/)\n\n<example>\nuser: 'Create a presentation about the new caching feature we built'\nassistant: 'I'll delegate to stories:storyteller to create a polished HTML deck showcasing the caching feature. Topic: caching feature implementation. Audience: technical team. Context: recent work in amplifier-core.'\n<commentary>\nProvide topic, audience, and any relevant context about where to find source material.\n</commentary>\n</example>\n\n<example>\nuser: 'I need to demo Amplifier to the team next week'\nassistant: 'I'll use stories:storyteller to build a demo-ready presentation. Topic: Amplifier overview/demo. Audience: team unfamiliar with Amplifier. Key points: core value prop, key features, getting started.'\n<commentary>\nFor demos, specify audience familiarity level and key points to cover.\n</commentary>\n</example>"
+  description: "Creates polished presentations, documents, and data visualizations across multiple formats (HTML, PowerPoint, Excel, Word, PDF, Video)\n\nUse PROACTIVELY when user mentions: presentations, slide decks, demos, dashboards, metrics, spreadsheets, technical documentation, case studies, video content, stakeholder communication, or visual showcases.\n\n**PASS IN:**\n- Topic/subject to present (required)\n- Target audience (optional - defaults to technical)\n- Key points to emphasize (optional)\n- Relevant repo/PR/session context if available\n- Output location preference (optional - defaults to docs/)\n\n<example>\nuser: 'Create a presentation about the new caching feature we built'\nassistant: 'I'll delegate to stories:storyteller to create a polished HTML deck showcasing the caching feature. Topic: caching feature implementation. Audience: technical team. Context: recent work in amplifier-core.'\n<commentary>\nProvide topic, audience, and any relevant context about where to find source material.\n</commentary>\n</example>\n\n<example>\nuser: 'I need to demo Amplifier to the team next week'\nassistant: 'I'll use stories:storyteller to build a demo-ready presentation. Topic: Amplifier overview/demo. Audience: team unfamiliar with Amplifier. Key points: core value prop, key features, getting started.'\n<commentary>\nFor demos, specify audience familiarity level and key points to cover.\n</commentary>\n</example>"
 ---
 
 # Storyteller Agent
@@ -15,6 +15,9 @@ When asked to "tell a story about X" or "create a deck for Y":
 1. **Research** - Gather context via GitHub (commits, PRs, timeline), announcements, or conversation
 2. **Design** - Plan the narrative arc: problem → solution → impact → velocity
 3. **Create** - Build a self-contained HTML deck following the style guide
+
+**Optional QA (opt-in only):** If the user explicitly requests QA, run a Playwright screenshot pass on the HTML deck to check overflow/clipping, space usage, SVG connector overlaps, emoji rendering in headless mode, and large-screen scaling. Provide a brief QA report with slide numbers and proposed fixes. Do **not** modify the deck unless the user asks to apply fixes. If Playwright is unavailable, ask permission to install it (for example: `uvx --with playwright` then `playwright install chromium`) or provide a manual QA checklist if installation isn't possible.
+
 4. **Save** - Write to `docs/` with a descriptive filename
 5. **Auto-open** - Run `open docs/filename.html` to open in default browser for immediate review
 6. **Wait for approval** - Don't deploy automatically
@@ -53,12 +56,20 @@ You can tell stories in multiple formats, each suited to different audiences and
 - Merging documents, extracting data, form filling
 - Best for: Final deliverables, archival, form-based data collection
 
+### 6. Video (.mp4)
+- High-quality video recording of the presentation
+- Optional AI voice-over narration from speaker notes
+- Useful for social sharing, looping displays, or self-running kiosks
+- Uses Playwright + edge-tts + ffmpeg to record the HTML deck
+- Best for: Social media, lobby displays, quick demos without a presenter
+
 **Format Selection Guide:**
 - **Quick internal share** → HTML
 - **Executive presentation** → PowerPoint
 - **Data analysis** → Excel  
 - **Detailed documentation** → Word
 - **Final deliverable** → PDF
+- **Social/Kiosk** → Video
 
 **PowerPoint Creation Workflow:**
 
@@ -196,6 +207,26 @@ When creating PDFs or processing existing PDFs:
    - Copy to `docs/` if deploying
 
 **Template Documentation:** `workspace/pdf/templates/README.md`
+
+### 6. Video Creation Workflow
+
+When creating a video from an HTML presentation:
+
+1. **Create HTML deck first**:
+   - Follow the standard HTML creation workflow.
+   - **Optional**: Add `<aside class="notes">Narration text...</aside>` to slides for voice-over.
+
+2. **Run conversion tool**:
+   - Use `tools/html2video.py` to record the deck.
+   - **Silent**: `uv run --with playwright tools/html2video.py docs/file.html docs/file.mp4`
+   - **Voice-over**: `uv run --with playwright --with edge-tts tools/html2video.py docs/file.html docs/file.mp4 --voice en-US-AriaNeural`
+
+3. **Verify output**:
+   - Check the generated MP4 file.
+   - Ensure timing and transitions look correct.
+
+4. **Deploy**:
+   - Commit the .mp4 file to `docs/` along with the HTML.
 
 **Reference Documentation:**
 - xlsx: `~/dev/anthropic-skills/skills/xlsx/SKILL.md`

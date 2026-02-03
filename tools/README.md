@@ -41,6 +41,66 @@ uv run --with python-pptx,beautifulsoup4,lxml python tools/html2pptx.py docs/my-
 
 ---
 
+### html2video.py
+
+Converts HTML presentation decks to MP4 video with optional AI voice-over narration.
+
+**Purpose:** Create shareable video content from HTML presentations for social media, lobby displays, or self-running kiosks.
+
+**Usage:**
+```bash
+# Silent mode (no voice-over) - uses min-duration per slide
+uv run --with playwright tools/html2video.py docs/my-deck.html docs/my-deck.mp4
+
+# With AI voice-over from speaker notes
+uv run --with playwright --with edge-tts tools/html2video.py docs/my-deck.html docs/my-deck.mp4
+
+# Custom settings
+uv run --with playwright --with edge-tts tools/html2video.py docs/my-deck.html docs/my-deck.mp4 \
+    --min-duration 3 \
+    --width 1920 --height 1080 \
+    --voice en-GB-SoniaNeural
+```
+
+**Speaker Notes Format:**
+Add notes inside slides for voice-over narration:
+```html
+<div class="slide">
+    <h1>My Slide Title</h1>
+    <div class="notes">This text will be spoken as voice-over narration.</div>
+</div>
+```
+
+**Options:**
+- `--min-duration` - Minimum seconds per slide (default: 5.0)
+- `--width` / `--height` - Video dimensions (default: 1920x1080)
+- `--voice` - Edge TTS voice ID (default: en-US-AriaNeural)
+
+**Requirements:**
+- `ffmpeg` and `ffprobe` must be installed on system path
+- Playwright (loaded via `uv run --with playwright`)
+- edge-tts (optional, for voice-over: `uv run --with edge-tts`)
+
+**Output:**
+- H.264 encoded MP4 video
+- AAC audio (voice-over or silence)
+- Slide timing synchronized with audio duration
+
+---
+
+### pptx2images.py
+
+Converts PowerPoint presentations to individual slide images.
+
+**Purpose:** Extract slide images from PPTX files for use in documentation or preview generation.
+
+**Usage:**
+```bash
+python tools/pptx2images.py input.pptx output_directory/
+```
+
+---
+
 ### analyze_sessions.py
 
 Analyzes Amplifier session data from `events.jsonl` files to extract usage patterns, agent interactions, and performance metrics.
