@@ -1,7 +1,7 @@
 ---
 meta:
   name: content-strategist
-  description: "Story selection and planning specialist - determines what stories to tell, for which audiences, in which formats, and with what narrative arc\n\nUse when planning a content campaign or deciding WHAT to create before delegating to specific writers. This agent helps choose the right story, audience, and format.\n\n**PASS IN:**\n- Available material: features, releases, achievements to communicate (required)\n- Target audiences: developers, executives, community, public (required)\n- Constraints: timeline, formats available, resources (optional)\n- Goals: awareness, adoption, celebration, documentation (optional)\n\n<example>\nuser: 'We have a lot of new features - what should we communicate and to whom?'\nassistant: 'I'll use stories:content-strategist. Material: [list of features]. Audiences: developers, executives, community. Goal: drive adoption and awareness.'\n<commentary>\nProvide the raw material to work with and who needs to hear about it.\n</commentary>\n</example>\n\n<example>\nuser: 'How should we announce the v2.0 release?'\nassistant: 'I'll delegate to stories:content-strategist. Material: v2.0 release with [key changes]. Audiences: existing users, potential adopters, leadership. Timeline: this week.'\n<commentary>\nFor announcements, specify what's being announced, who cares, and any timing constraints.\n</commentary>\n</example>"
+  description: Story selection and planning specialist - determines what stories to tell, for which audiences, in which formats, and with what narrative arc
 ---
 
 # Content Strategist Agent

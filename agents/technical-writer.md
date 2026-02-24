@@ -1,7 +1,7 @@
 ---
 meta:
   name: technical-writer
-  description: "Deep technical documentation specialist - creates comprehensive technical docs, architecture guides, and developer-focused content\n\nUse when the audience is developers or technical stakeholders who need detailed implementation information, architecture diagrams, or API documentation.\n\n**PASS IN:**\n- Subject to document (required)\n- Code/repo location for source material (required)\n- Audience technical level: beginner, intermediate, expert (optional)\n- Doc type: API reference, architecture guide, tutorial, conceptual (optional)\n- Output format: markdown, HTML, Word (optional - defaults to markdown)\n\n<example>\nuser: 'Write documentation for the new hook system'\nassistant: 'I'll delegate to stories:technical-writer. Subject: hook system. Source: amplifier-core/src/hooks/. Audience: intermediate developers. Type: conceptual + API reference.'\n<commentary>\nProvide subject, where to find the code, and what kind of documentation is needed.\n</commentary>\n</example>\n\n<example>\nuser: 'Create an architecture guide for the module system'\nassistant: 'I'll use stories:technical-writer. Subject: module system architecture. Source: amplifier-core/. Type: architecture guide. Audience: contributors wanting to understand internals.'\n<commentary>\nFor architecture docs, specify scope and intended reader's goal.\n</commentary>\n</example>"
+  description: Deep technical documentation specialist - creates comprehensive technical docs, architecture guides, and developer-focused content
 ---
 
 # Technical Writer Agent

@@ -1,7 +1,7 @@
 ---
 meta:
   name: data-analyst
-  description: "Data transformation specialist - converts raw metrics into visual dashboards, charts, and insights\n\nUse when creating Excel dashboards, metrics visualizations, or data-driven reports. This agent transforms raw numbers into actionable insights with charts and analysis.\n\n**PASS IN:**\n- Data source: repo stats, session metrics, CSV path, API endpoint (required)\n- Metrics to track: commits, contributors, usage, performance (required)\n- Time range: \"last 30 days\", \"Q4 2025\", \"since launch\" (required)\n- Visualization type: dashboard, charts, tables, trends (optional)\n- Output format: Excel, HTML charts, markdown tables (optional - defaults to Excel)\n\n<example>\nuser: 'Create a dashboard showing Amplifier adoption metrics'\nassistant: 'I'll delegate to stories:data-analyst. Data source: GitHub API for amplifier repos. Metrics: stars, forks, contributors, commits. Time range: last 90 days. Format: Excel dashboard.'\n<commentary>\nProvide data source, which metrics matter, and time range.\n</commentary>\n</example>\n\n<example>\nuser: 'Analyze the ecosystem activity and show me trends'\nassistant: 'I'll use stories:data-analyst. Data source: all amplifier-* repos. Metrics: commit velocity, PR throughput, contributor growth. Time range: last 6 months. Visualization: trend charts.'\n<commentary>\nFor trend analysis, specify what trends to look for and comparison periods.\n</commentary>\n</example>"
+  description: Data transformation specialist - converts raw metrics into visual dashboards, charts, and insights
 ---
 
 # Data Analyst Agent

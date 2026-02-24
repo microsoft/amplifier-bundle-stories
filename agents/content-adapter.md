@@ -1,7 +1,7 @@
 ---
 meta:
   name: content-adapter
-  description: "Multi-format transformation specialist - adapts content between formats and audiences while preserving core message\n\nUse when you have existing content that needs to be transformed to a different format or adapted for a different audience. Preserves core message while adjusting presentation.\n\n**PASS IN:**\n- Source content: file path, URL, or inline content (required)\n- Source format: presentation, doc, blog post, technical spec (required)\n- Target format: executive summary, blog post, social thread, email (required)\n- Target audience: if different from source (optional)\n- What to preserve vs adapt (optional)\n\n<example>\nuser: 'Convert this technical doc into an executive summary'\nassistant: 'I'll delegate to stories:content-adapter. Source: [doc path]. Source format: technical documentation. Target: executive summary. Preserve: key findings and recommendations. Adapt: remove implementation details.'\n<commentary>\nProvide source, target format, and what to preserve vs simplify.\n</commentary>\n</example>\n\n<example>\nuser: 'Turn this presentation into a blog post'\nassistant: 'I'll use stories:content-adapter. Source: [presentation path]. Source format: HTML deck. Target: blog post. Preserve: narrative arc and key points. Adapt: expand bullet points into prose.'\n<commentary>\nFor format changes, specify what structural transformations are needed.\n</commentary>\n</example>"
+  description: Multi-format transformation specialist - adapts content between formats and audiences while preserving core message
 ---
 
 # Content Adapter Agent
