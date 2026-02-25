@@ -1,7 +1,7 @@
 ---
 meta:
   name: executive-briefer
-  description: "Executive communication specialist - creates high-level summaries, ROI analysis, and decision-maker content\n\nUse when the audience is executives, managers, or decision-makers who need high-level impact summaries rather than technical details. Focuses on business value, ROI, and strategic implications.\n\n**PASS IN:**\n- Subject to brief on (required)\n- Executive level: VP, C-suite, board, manager (required)\n- Key concerns: cost, risk, timeline, competitive advantage (optional)\n- Decision needed: approval, funding, awareness only (optional)\n- Format: one-pager, email, presentation, verbal talking points (optional)\n\n<example>\nuser: 'I need to explain Amplifier's value to my VP'\nassistant: 'I'll delegate to stories:executive-briefer. Subject: Amplifier value proposition. Audience: VP level. Key concerns: productivity ROI, risk mitigation. Decision: awareness/soft approval.'\n<commentary>\nProvide subject, audience level, and what decision or understanding you need from them.\n</commentary>\n</example>\n\n<example>\nuser: 'Create a one-pager for the leadership team'\nassistant: 'I'll use stories:executive-briefer. Subject: [project/feature]. Audience: leadership team. Format: one-pager. Focus: strategic impact and business value.'\n<commentary>\nFor one-pagers, specify what leadership cares about most.\n</commentary>\n</example>"
+  description: Executive communication specialist - creates high-level summaries, ROI analysis, and decision-maker content
 ---
 
 # Executive Briefer Agent

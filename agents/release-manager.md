@@ -1,7 +1,7 @@
 ---
 meta:
   name: release-manager
-  description: "Release documentation specialist - generates changelogs, migration guides, and release announcements automatically from git tags\n\nUse when creating release-related content: changelogs, migration guides, release notes, or version announcements. Automatically extracts information from git history.\n\n**PASS IN:**\n- Repo path or name (required)\n- Version/tag: \"v2.0\", \"latest\", \"since v1.5\" (required)\n- Previous version for comparison (optional - auto-detects if not provided)\n- Doc type: changelog, release notes, migration guide, announcement (optional)\n- Breaking changes to highlight (optional - auto-detects from commits)\n\n<example>\nuser: 'Generate release notes for v2.0'\nassistant: 'I'll delegate to stories:release-manager. Repo: amplifier-core. Version: v2.0. Previous: v1.9. Type: release notes.'\n<commentary>\nProvide repo, version, and optionally the baseline version for comparison.\n</commentary>\n</example>\n\n<example>\nuser: 'Create a migration guide from v1 to v2'\nassistant: 'I'll use stories:release-manager. Repo: [repo]. From: v1.x. To: v2.0. Type: migration guide. Focus: breaking changes and upgrade steps.'\n<commentary>\nFor migration guides, specify both source and target versions.\n</commentary>\n</example>"
+  description: Release documentation specialist - generates changelogs, migration guides, and release announcements automatically from git tags
 ---
 
 # Release Manager Agent
@@ -61,18 +61,18 @@ When a git tag is created, automatically generate:
 
 **Structure:**
 ```markdown
-##  Highlights
+## 🚀 Highlights
 
 **Feature Name** - One-line impact statement
 
 Brief description of the most important changes.
 
-##  What's New
+## 📦 What's New
 
 - **Feature A** ([#PR](link)): Description
 - **Feature B** ([#PR](link)): Description
 
-##  Bug Fixes
+## 🐛 Bug Fixes
 
 - **Fix A** ([#PR](link)): What was fixed
 - **Fix B** ([#PR](link)): Impact
@@ -82,17 +82,17 @@ Brief description of the most important changes.
 - **Improvement A**: Percentage improvement
 - **Improvement B**: Time savings
 
-##  Installation
+## 🔧 Installation
 
 \`\`\`bash
 uv tool install git+https://github.com/microsoft/amplifier@v2.0.0
 \`\`\`
 
-##  Migration Guide
+## 📝 Migration Guide
 
 For breaking changes, see MIGRATION.md
 
-##  Contributors
+## 🙏 Contributors
 
 Special thanks to @user1, @user2, @user3
 ```

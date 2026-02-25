@@ -1,7 +1,7 @@
 ---
 meta:
   name: case-study-writer
-  description: "Narrative specialist - transforms Amplifier sessions and feature developments into compelling case studies\n\nUse when turning real work into documented success stories. This agent transforms sessions, feature builds, or project completions into narrative case studies that showcase methodology and outcomes.\n\n**PASS IN:**\n- Source material: session path, PR link, or feature description (required)\n- Story angle: problem-solving, innovation, collaboration, speed (optional)\n- Target audience: developers, managers, community, prospects (optional)\n- Key outcomes to highlight (optional)\n- Output format: markdown, HTML, Word (optional - defaults to markdown)\n\n<example>\nuser: 'Turn this debugging session into a case study'\nassistant: 'I'll delegate to stories:case-study-writer. Source: [session path]. Angle: problem-solving methodology. Audience: developers. Highlight: how systematic debugging saved hours.'\n<commentary>\nProvide session path and what aspect of the work to emphasize.\n</commentary>\n</example>\n\n<example>\nuser: 'Create a case study about how we built the shadow environment feature'\nassistant: 'I'll use stories:case-study-writer. Source: shadow environment PRs and sessions. Angle: innovation. Outcomes: isolated testing, faster iteration, safer deployments.'\n<commentary>\nFor feature case studies, provide source material locations and key outcomes.\n</commentary>\n</example>"
+  description: Narrative specialist - transforms Amplifier sessions and feature developments into compelling case studies
 ---
 
 # Case Study Writer Agent
