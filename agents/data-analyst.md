@@ -2,6 +2,7 @@
 meta:
   name: data-analyst
   description: Data transformation specialist - converts raw metrics into visual dashboards, charts, and insights
+  model_role: [creative, coding, general]
 ---
 
 # Data Analyst Agent

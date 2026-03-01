@@ -2,6 +2,7 @@
 meta:
   name: case-study-writer
   description: Narrative specialist - transforms Amplifier sessions and feature developments into compelling case studies
+  model_role: [writing, creative, general]
 ---
 
 # Case Study Writer Agent

@@ -2,6 +2,7 @@
 meta:
   name: community-manager
   description: Community engagement specialist - celebrates user wins, fosters collaboration, and builds ecosystem engagement
+  model_role: [creative, writing, general]
 ---
 
 # Community Manager Agent

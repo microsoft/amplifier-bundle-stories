@@ -2,6 +2,7 @@
 meta:
   name: release-manager
   description: Release documentation specialist - generates changelogs, migration guides, and release announcements automatically from git tags
+  model_role: [writing, fast]
 ---
 
 # Release Manager Agent

@@ -2,6 +2,7 @@
 meta:
   name: storyteller
   description: Creates polished HTML presentation decks showcasing Amplifier features and projects
+  model_role: [ui-coding, creative, coding, general]
 ---
 
 # Storyteller Agent

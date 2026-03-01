@@ -2,6 +2,7 @@
 meta:
   name: executive-briefer
   description: Executive communication specialist - creates high-level summaries, ROI analysis, and decision-maker content
+  model_role: [writing, general]
 ---
 
 # Executive Briefer Agent

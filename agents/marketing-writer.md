@@ -2,6 +2,7 @@
 meta:
   name: marketing-writer
   description: External communication specialist - creates engaging content for community, users, and public audiences
+  model_role: [writing, creative, general]
 ---
 
 # Marketing Writer Agent

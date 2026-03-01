@@ -2,6 +2,7 @@
 meta:
   name: content-adapter
   description: Multi-format transformation specialist - adapts content between formats and audiences while preserving core message
+  model_role: [writing, general]
 ---
 
 # Content Adapter Agent

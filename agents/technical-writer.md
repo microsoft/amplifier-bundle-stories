@@ -2,6 +2,7 @@
 meta:
   name: technical-writer
   description: Deep technical documentation specialist - creates comprehensive technical docs, architecture guides, and developer-focused content
+  model_role: [writing, creative, general]
 ---
 
 # Technical Writer Agent

@@ -2,6 +2,7 @@
 meta:
   name: story-researcher
   description: Automated data gathering specialist - mines git repos, sessions, bundles, and ecosystem activity to discover stories worth telling
+  model_role: [research, fast]
 ---
 
 # Story Researcher Agent

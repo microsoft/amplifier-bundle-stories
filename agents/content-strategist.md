@@ -2,6 +2,7 @@
 meta:
   name: content-strategist
   description: Story selection and planning specialist - determines what stories to tell, for which audiences, in which formats, and with what narrative arc
+  model_role: [creative, writing, general]
 ---
 
 # Content Strategist Agent
