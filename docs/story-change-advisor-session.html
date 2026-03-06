@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>The Tool That Built Itself — Change Advisor Story</title>
+    <style>
+        :root {
+            --accent: #D4845A;
+            --accent-glow: rgba(212, 132, 90, 0.15);
+            --surface-1: rgba(255,255,255,0.06);
+            --surface-2: rgba(255,255,255,0.10);
+            --border-subtle: rgba(255,255,255,0.12);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-tertiary: rgba(255,255,255,0.5);
+
+            --fs-hero: clamp(32px, 7vw, 64px);
+            --fs-h1: clamp(26px, 5.5vw, 44px);
+            --fs-h2: clamp(22px, 4vw, 36px);
+            --fs-h3: clamp(18px, 3vw, 28px);
+            --fs-body: clamp(15px, 2.2vw, 20px);
+            --fs-body-lg: clamp(16px, 2.5vw, 22px);
+            --fs-small: clamp(12px, 1.8vw, 14px);
+            --fs-label: clamp(11px, 1.4vw, 13px);
+            --fs-big-number: clamp(64px, 18vw, 160px);
+            --fs-quote: clamp(20px, 3.5vw, 32px);
+            --fs-quote-hero: clamp(22px, 4vw, 38px);
+
+            --space-xs: clamp(8px, 1.5vw, 12px);
+            --space-sm: clamp(12px, 2vw, 16px);
+            --space-md: clamp(16px, 3vw, 24px);
+            --space-lg: clamp(24px, 4vw, 40px);
+            --space-xl: clamp(32px, 6vw, 60px);
+
+            --radius-sm: clamp(8px, 1vw, 12px);
+            --radius-md: clamp(12px, 1.5vw, 16px);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: var(--text-primary);
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* Slide base */
+        .slide {
+            display: none;
+            width: 100vw;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: clamp(60px, 10vw, 120px) clamp(24px, 6vw, 100px) clamp(80px, 12vw, 100px);
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .slide.active { display: flex; }
+        .center { text-align: center; align-items: center; justify-content: center; }
+
+        /* Utility spacing */
+        .mt-sm { margin-top: var(--space-sm); }
+        .mt-md { margin-top: var(--space-md); }
+        .mt-lg { margin-top: var(--space-lg); }
+        .mt-xl { margin-top: var(--space-xl); }
+
+        /* Typography */
+        .section-label {
+            font-size: var(--fs-label);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--accent);
+            margin-bottom: var(--space-md);
+        }
+
+        .headline {
+            font-size: var(--fs-hero);
+            font-weight: 700;
+            letter-spacing: clamp(-0.5px, -0.02em, -1.5px);
+            line-height: 1.12;
+            margin-bottom: var(--space-md);
+        }
+
+        .medium-headline {
+            font-size: var(--fs-h1);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: var(--space-md);
+        }
+
+        .subhead {
+            font-size: var(--fs-h3);
+            color: var(--text-secondary);
+            line-height: 1.45;
+            max-width: min(680px, 88vw);
+        }
+
+        .body-text {
+            font-size: var(--fs-body);
+            color: var(--text-secondary);
+            line-height: 1.65;
+            max-width: min(640px, 88vw);
+        }
+
+        .small-text {
+            font-size: var(--fs-small);
+            color: var(--text-tertiary);
+        }
+
+        .big-number {
+            font-size: var(--fs-big-number);
+            font-weight: 700;
+            letter-spacing: -3px;
+            line-height: 1;
+            color: var(--accent);
+        }
+
+        .unit { font-size: 0.45em; font-weight: 500; letter-spacing: 0; }
+
+        /* Quotes */
+        .quote-block {
+            border-left: 3px solid var(--accent);
+            padding-left: var(--space-lg);
+            margin: var(--space-lg) 0;
+            max-width: min(720px, 88vw);
+        }
+
+        .quote-text {
+            font-size: var(--fs-quote);
+            font-style: italic;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .quote-hero {
+            font-size: var(--fs-quote-hero);
+            font-style: italic;
+            line-height: 1.4;
+            max-width: min(800px, 88vw);
+            color: var(--text-primary);
+        }
+
+        /* Punchline */
+        .punchline {
+            font-size: var(--fs-h2);
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .dim-text {
+            font-size: var(--fs-body);
+            color: var(--text-secondary);
+            line-height: 1.65;
+            max-width: min(680px, 88vw);
+        }
+
+        /* Stats grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(160px, 45%), 1fr));
+            gap: var(--space-md);
+            width: min(760px, 90vw);
+        }
+
+        .stat-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: clamp(32px, 7vw, 56px);
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: var(--fs-small);
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Two-column cards */
+        .two-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+            gap: var(--space-lg);
+            width: min(800px, 90vw);
+        }
+
+        .col-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+        }
+
+        .col-card h3 {
+            font-size: var(--fs-h3);
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
+        }
+
+        .col-card p {
+            font-size: var(--fs-body);
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        /* Naming transition */
+        .name-transition {
+            font-size: var(--fs-h1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .strike {
+            text-decoration: line-through;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .arrow { color: var(--accent); }
+        .emphasis { color: var(--accent); font-weight: 700; }
+
+        /* Session output list */
+        .output-list {
+            list-style: none;
+            max-width: min(520px, 88vw);
+        }
+
+        .output-list li {
+            font-size: var(--fs-h3);
+            color: var(--text-secondary);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-sm);
+        }
+
+        .output-list .num {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: var(--fs-h2);
+            min-width: 1.8em;
+            text-align: right;
+        }
+
+        /* Closing */
+        .closing-lead {
+            font-size: var(--fs-h2);
+            color: var(--text-secondary);
+            line-height: 1.4;
+            max-width: min(700px, 88vw);
+        }
+
+        .closing-line {
+            font-size: var(--fs-h1);
+            font-weight: 600;
+            color: var(--accent);
+            line-height: 1.3;
+            max-width: min(760px, 88vw);
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-block;
+            font-size: var(--fs-label);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            background: var(--accent-glow);
+            color: var(--accent);
+            border: 1px solid rgba(212, 132, 90, 0.3);
+        }
+
+        /* Sources */
+        .sources-content {
+            font-size: var(--fs-small);
+            color: var(--text-secondary);
+            line-height: 1.9;
+            max-width: min(640px, 88vw);
+        }
+
+        .sources-content strong { color: var(--text-primary); }
+
+        .sources-content ul {
+            list-style: none;
+            padding-left: var(--space-md);
+            margin: var(--space-xs) 0;
+        }
+
+        .sources-content li::before {
+            content: "\2014\00a0";
+            color: var(--accent);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            right: clamp(20px, 5vw, 40px);
+            font-size: var(--fs-small);
+            color: var(--text-tertiary);
+            z-index: 100;
+        }
+
+        .more-stories {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(10px, 1.3vw, 11px);
+            color: rgba(255,255,255,0.25);
+            text-decoration: none;
+            z-index: 100;
+        }
+        .more-stories:hover { color: rgba(255,255,255,0.45); }
+
+        /* Responsive */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .slide { padding: 16px clamp(20px, 5vw, 80px) 60px; }
+            .slide.center { justify-content: flex-start; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide, .slide * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ SLIDE 1: TITLE ============ -->
+    <div class="slide active center">
+        <div class="section-label">Case Study</div>
+        <h1 class="headline">One Line of Code,<br>68 Hidden Files,<br>and the Tool That Built Itself</h1>
+        <p class="subhead mt-md">A story about human judgment in the age of AI-generated pull requests</p>
+        <div class="mt-lg">
+            <span class="status-badge">New &mdash; March 2026</span>
+        </div>
+    </div>
+
+    <!-- ============ SLIDE 2: THE SCENE ============ -->
+    <div class="slide center">
+        <div class="section-label">The Pull Request</div>
+        <div class="big-number">1</div>
+        <p class="body-text mt-lg">
+            A product manager looks at a pull request. One line of code.
+            A colleague wants to add a memory system to a research pipeline
+            built on one principle: <em>every piece of research shows its work.</em>
+        </p>
+        <p class="punchline mt-lg">
+            He's not technical. He knows that makes him<br>
+            exactly the person most likely to approve<br>
+            something he shouldn't.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 3: WHAT WAS HIDING ============ -->
+    <div class="slide center">
+        <div class="section-label">Behind That Single Line</div>
+        <div class="stat-grid mt-md">
+            <div class="stat-card">
+                <div class="stat-number">68</div>
+                <div class="stat-label">files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">9</div>
+                <div class="stat-label">tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">behavioral hooks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">200<span class="unit">MB</span></div>
+                <div class="stat-label">dependencies</div>
+            </div>
+        </div>
+        <p class="dim-text mt-xl">
+            A silent memory system that would watch every session,
+            learn from every interaction, and never tell the user
+            it was doing any of it.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 4: THE KILL SHOT ============ -->
+    <div class="slide">
+        <div class="section-label">The Kill Shot</div>
+        <h2 class="medium-headline">The insight didn't come from the scan.<br>It came from the conversation.</h2>
+        <div class="quote-block">
+            <p class="quote-text">
+                Chris mentioned, almost offhand, that he constantly runs
+                test sessions through his specialists. Competitive analyses.
+                Storyteller experiments. Junk data by design.
+            </p>
+        </div>
+        <p class="body-text mt-md">
+            A silent memory system doesn't know the difference.
+            It would ingest test noise as real knowledge
+            and feed it back into future work.
+        </p>
+        <p class="punchline mt-xl">The tool's memory would be poisoned from day one.</p>
+    </div>
+
+    <!-- ============ SLIDE 5: THE CONVERSATION ============ -->
+    <div class="slide">
+        <div class="section-label">What Worked</div>
+        <h2 class="medium-headline">Neither alone would have caught it.</h2>
+        <div class="two-col mt-lg">
+            <div class="col-card">
+                <h3>Chris brought</h3>
+                <p>Context no automated review could have&thinsp;&mdash;&thinsp;he knew how the product
+                actually gets used. The test sessions, the junk data, the daily reality.</p>
+            </div>
+            <div class="col-card">
+                <h3>The AI brought</h3>
+                <p>Lenses he didn't naturally have&thinsp;&mdash;&thinsp;CTO-level dependency analysis,
+                CPO-level philosophy checks. Structured ways to see what one line hides.</p>
+            </div>
+        </div>
+        <p class="punchline mt-xl">
+            Together, they caught something<br>neither would have caught alone.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 6: THE NAME ============ -->
+    <div class="slide center">
+        <div class="section-label">Naming</div>
+        <div class="quote-block" style="text-align:left">
+            <p class="quote-text">&ldquo;The name doesn't think of the user's job.&rdquo;</p>
+        </div>
+        <p class="body-text mt-lg">
+            Nobody's job is reviewing PRs.<br>
+            The job is making good decisions<br>
+            about what enters your product.
+        </p>
+        <div class="name-transition mt-xl">
+            <span class="strike">PR Review Tool</span>
+            <span class="arrow">&rarr;</span>
+            <span class="emphasis">Change Advisor</span>
+        </div>
+    </div>
+
+    <!-- ============ SLIDE 7: DOC-DRIVEN DEV ============ -->
+    <div class="slide center">
+        <div class="section-label">Before Writing Code</div>
+        <div class="big-number">306</div>
+        <p class="subhead mt-sm">
+            lines. A vision document.<br>Before writing a single line of code.
+        </p>
+        <p class="body-text mt-lg">
+            His own methodology&thinsp;&mdash;&thinsp;doc-driven dev.<br>
+            Define the problem, the positioning, the principles.<br>
+            <em>Then</em> build.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 8: THE CORE INSIGHT ============ -->
+    <div class="slide center">
+        <div class="section-label">The Core Insight</div>
+        <p class="quote-hero">
+            &ldquo;AI amplifies velocity<br>
+            but fragments alignment.<br><br>
+            People are doing more<br>
+            and talking less.&rdquo;
+        </p>
+        <p class="dim-text mt-xl">
+            Contributors arrive with polished, AI-generated PRs that look professional
+            and conflict with your product philosophy&thinsp;&mdash;&thinsp;because their AI
+            optimized for <em>their</em> task, not <em>your</em> coherence.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 9: PHILOSOPHY CATCHES ITSELF ============ -->
+    <div class="slide">
+        <div class="section-label">The Review</div>
+        <h2 class="medium-headline">They reviewed the tool<br>against its own vision document.</h2>
+        <div class="stat-grid mt-lg">
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">gaps found</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1</div>
+                <div class="stat-label">real contradiction</div>
+            </div>
+        </div>
+        <div class="quote-block mt-xl">
+            <p class="quote-text">
+                The recipe asked for APPROVE/REJECT verdicts,
+                but the vision document explicitly said
+                <em>the tool never decides.</em>
+            </p>
+        </div>
+        <p class="punchline mt-lg">Without the vision doc, that ships.</p>
+    </div>
+
+    <!-- ============ SLIDE 10: THE HONEST MOMENT ============ -->
+    <div class="slide center">
+        <div class="section-label">The Honest Moment</div>
+        <p class="quote-hero">
+            &ldquo;I'm a PM and not as technical.<br>
+            Are we overcomplicating this?&rdquo;
+        </p>
+        <p class="body-text mt-xl">
+            Fixed the contradiction.<br>
+            Documented the rest as backlog.<br>
+            Shipped it.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 11: WHAT ACTUALLY HAPPENED ============ -->
+    <div class="slide">
+        <div class="section-label">One Session</div>
+        <h2 class="medium-headline">What actually happened</h2>
+        <p class="dim-text">A non-technical PM who wrote no code produced:</p>
+        <ul class="output-list mt-lg">
+            <li><span class="num">1</span> vision document&thinsp;&mdash;&thinsp;306 lines</li>
+            <li><span class="num">1</span> working recipe</li>
+            <li><span class="num">4</span> executive analysis lenses</li>
+            <li><span class="num">1</span> prioritized backlog</li>
+        </ul>
+        <p class="punchline mt-xl">
+            He needed to review a pull request.<br>
+            The process turned out to be the product.
+        </p>
+    </div>
+
+    <!-- ============ SLIDE 12: SOURCES ============ -->
+    <div class="slide">
+        <div class="section-label">Sources</div>
+        <h2 class="medium-headline">Narrative Source</h2>
+        <div class="sources-content">
+            <p><strong>Data as of:</strong> March 5, 2026</p>
+            <p><strong>Type:</strong> First-person session narrative</p>
+            <p><strong>Author:</strong> Chris Park (product manager, sole session participant)</p>
+            <p class="mt-md"><strong>All numbers cited in this deck come from the session account:</strong></p>
+            <ul>
+                <li>68 files, 9 tools, 3 behavioral hooks, 200 MB&thinsp;&mdash;&thinsp;from AI analysis of the PR during the session</li>
+                <li>306-line vision document&thinsp;&mdash;&thinsp;produced during the session, exists in repo</li>
+                <li>5 gaps, 1 contradiction&thinsp;&mdash;&thinsp;from reviewing the recipe against the vision doc</li>
+                <li>4 executive lenses&thinsp;&mdash;&thinsp;defined in the Change Advisor recipe</li>
+            </ul>
+            <p class="mt-md"><strong>Feature status:</strong> New&thinsp;&mdash;&thinsp;Change Advisor recipe and vision doc created in this session</p>
+            <p><strong>Repository:</strong> amplifier-change-advisor (Chris Park / personal project)</p>
+            <p class="mt-md"><strong>Note:</strong> No automated research was performed for this deck.
+            This is a case study based on a provided session narrative, not a data-mined feature story.
+            PR analysis numbers (68 files, etc.) originate from AI analysis within the described session
+            and have not been independently re-verified for this presentation.</p>
+        </div>
+    </div>
+
+    <!-- ============ SLIDE 13: THE CLOSING ============ -->
+    <div class="slide center">
+        <p class="closing-lead">
+            The most valuable moment&thinsp;&mdash;&thinsp;the one that killed<br>
+            the integration&thinsp;&mdash;&thinsp;came from a conversation, not a scan.
+        </p>
+        <p class="closing-line mt-xl">
+            The AI didn't replace judgment.<br><br>
+            It created the conditions where<br>
+            judgment had somewhere to land.
+        </p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav" id="nav"></div>
+    <div class="slide-counter" id="counter"></div>
+    <a href="index.html" class="more-stories">More Stories</a>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            slides[currentSlide].scrollTop = 0;
+            updateNav();
+        }
+
+        function updateNav() {
+            const nav = document.getElementById('nav');
+            const counter = document.getElementById('counter');
+            nav.innerHTML = '';
+            slides.forEach(function(_, i) {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+                dot.onclick = function(e) { e.stopPropagation(); showSlide(i); };
+                nav.appendChild(dot);
+            });
+            counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); showSlide(currentSlide + 1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); showSlide(currentSlide - 1); }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.nav') || e.target.closest('a')) return;
+            if (e.clientX > window.innerWidth / 2) showSlide(currentSlide + 1);
+            else showSlide(currentSlide - 1);
+        });
+
+        var touchStartX = 0;
+        var SWIPE_THRESHOLD = 50;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            var diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > SWIPE_THRESHOLD) {
+                if (diff > 0) showSlide(currentSlide + 1);
+                else showSlide(currentSlide - 1);
+            }
+        }, { passive: true });
+
+        updateNav();
+    </script>
+</body>
+</html>
