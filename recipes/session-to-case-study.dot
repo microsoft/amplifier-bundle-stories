@@ -1,0 +1,51 @@
+digraph session_to_case_study {
+    label="session-to-case-study recipe\nConvert sessions into compelling case studies"
+    labelloc=t
+    fontname="Helvetica"
+    fontsize=14
+    rankdir=TB
+    node [shape=box style="rounded,filled" fillcolor="#E8F0FE" fontname="Helvetica" fontsize=10]
+    edge [fontname="Helvetica" fontsize=9 color="#666666"]
+
+    // ── Start / End ──────────────────────────────────────────────────
+    start [label="Start" shape=ellipse fillcolor="#C8E6C9"]
+    done  [label="Done"  shape=ellipse fillcolor="#FFCDD2"]
+
+    // ── Steps ────────────────────────────────────────────────────────
+    research [label="1. research\n(story-researcher)\nAnalyze session file\nExtract metadata & metrics" fillcolor="#c8e6c9"]
+    strategy [label="2. strategy\n(content-strategist)\nEvaluate case-study worthiness\nPlan narrative arc" fillcolor="#c8e6c9"]
+
+    // ── Decision ─────────────────────────────────────────────────────
+    worthy [label="Case-study\nworthy?" shape=diamond fillcolor="#FFF9C4"]
+
+    // ── Worthy path ──────────────────────────────────────────────────
+    writing  [label="3. writing\n(case-study-writer)\nGenerate Word document\nChallenge/Approach/Results" fillcolor="#c8e6c9"]
+    finalize [label="4. finalize\n(bash)\nVerify file & auto-open" fillcolor="#bbdefb"]
+
+    // ── Not worthy path ──────────────────────────────────────────────
+    not_worthy [label="not-worthy-report\n(bash)\nExplain why not worthy" fillcolor="#bbdefb"]
+
+    // ── Edges ────────────────────────────────────────────────────────
+    start    -> research
+    research -> strategy
+    strategy -> worthy
+    worthy   -> writing     [label="yes"]
+    worthy   -> not_worthy  [label="no" style=dashed color="#E57373"]
+    writing  -> finalize
+    finalize -> done
+    not_worthy -> done
+
+    // ── Context ──────────────────────────────────────────────────────
+    subgraph cluster_context {
+        label="Context Variables"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontsize=10
+        node [shape=note fillcolor="#e1bee7" fontsize=9]
+
+        ctx_session [label="session_file\n(required)"]
+        ctx_output  [label="output_name\n(optional)"]
+    }
+    ctx_session -> research [style=dotted color="#999999"]
+}

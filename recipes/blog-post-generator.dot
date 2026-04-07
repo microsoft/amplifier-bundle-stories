@@ -1,0 +1,83 @@
+digraph blog_post_generator {
+    label="blog-post-generator recipe\nGenerate feature blog posts from git data"
+    labelloc=t
+    fontname="Helvetica"
+    fontsize=14
+    rankdir=TB
+    node [shape=box style="rounded,filled" fillcolor="#E8F0FE" fontname="Helvetica" fontsize=10]
+    edge [fontname="Helvetica" fontsize=9 color="#666666"]
+
+    // ── Start / End ──────────────────────────────────────────────────
+    start [label="Start" shape=ellipse fillcolor="#C8E6C9"]
+    done  [label="Done"  shape=ellipse fillcolor="#FFCDD2"]
+
+    // ── Phase 1: Research ────────────────────────────────────────────
+    subgraph cluster_research {
+        label="Phase 1: Feature Research"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        research [label="1. research\n(story-researcher)\nGit history, PRs, code,\nimpact & user feedback" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 2: Strategy ────────────────────────────────────────────
+    subgraph cluster_strategy {
+        label="Phase 2: Content Planning"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        planning [label="2. planning\n(content-strategist)\nNarrative arc, key points,\naudience, blog structure" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 3: Content Creation ────────────────────────────────────
+    subgraph cluster_creation {
+        label="Phase 3: Content Creation"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        write_blog   [label="3. write-blog-post\n(marketing-writer)\n800-1200 word blog post\nwith frontmatter" fillcolor="#c8e6c9"]
+        write_social [label="4. write-social-media\n(marketing-writer)\nTwitter thread, LinkedIn,\nDiscord announcement" fillcolor="#c8e6c9"]
+        write_tech   [label="5. write-technical-appendix\n(technical-writer)\nDeep technical companion\n(Word document)" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 4: Finalization ────────────────────────────────────────
+    subgraph cluster_finalize {
+        label="Phase 4: Finalization"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        save_files [label="6. save-files\n(bash)\nSave blog, social,\ncopy to docs/" fillcolor="#bbdefb"]
+        finalize   [label="7. finalize\n(bash)\nAuto-open blog post\nDisplay social content" fillcolor="#bbdefb"]
+    }
+
+    // ── Edges ────────────────────────────────────────────────────────
+    start    -> research
+    research -> planning
+    planning -> write_blog
+    write_blog   -> write_social
+    write_blog   -> write_tech [label="if include_technical" style=dashed]
+    write_social -> save_files
+    write_tech   -> save_files [style=dashed]
+    save_files   -> finalize
+    finalize     -> done
+
+    // ── Context ──────────────────────────────────────────────────────
+    subgraph cluster_context {
+        label="Context Variables"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontsize=10
+        node [shape=note fillcolor="#e1bee7" fontsize=9]
+
+        ctx_feature  [label="feature_name\n(required)"]
+        ctx_pr       [label="pr_number\n(optional)"]
+        ctx_audience [label="target_audience\n(default: community)"]
+        ctx_tech     [label="include_technical_appendix\n(default: false)"]
+    }
+    ctx_feature -> research [style=dotted color="#999999"]
+}

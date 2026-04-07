@@ -1,0 +1,84 @@
+digraph weekly_digest {
+    label="weekly-digest recipe\nComprehensive weekly ecosystem digest"
+    labelloc=t
+    fontname="Helvetica"
+    fontsize=14
+    rankdir=TB
+    node [shape=box style="rounded,filled" fillcolor="#E8F0FE" fontname="Helvetica" fontsize=10]
+    edge [fontname="Helvetica" fontsize=9 color="#666666"]
+
+    // ── Start / End ──────────────────────────────────────────────────
+    start [label="Start" shape=ellipse fillcolor="#C8E6C9"]
+    done  [label="Done"  shape=ellipse fillcolor="#FFCDD2"]
+
+    // ── Phase 1: Research ────────────────────────────────────────────
+    subgraph cluster_research {
+        label="Phase 1: Research & Data Gathering"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        git_activity [label="1. git-activity\n(story-researcher)\nScan repos for commits,\nPRs, releases, metrics" fillcolor="#c8e6c9"]
+        session_analysis [label="2. session-analysis\n(data-analyst)\nUsage patterns,\nagent/tool metrics" fillcolor="#c8e6c9"]
+        community [label="3. community-highlights\n(community-manager)\nExternal contributions,\ndiscussions, mentions" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 2: Strategy ────────────────────────────────────────────
+    subgraph cluster_strategy {
+        label="Phase 2: Content Strategy"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        content_strategy [label="4. content-strategy\n(content-strategist)\nIdentify top stories,\ndefine structure & audience" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 3: Writing ─────────────────────────────────────────────
+    subgraph cluster_writing {
+        label="Phase 3: Content Generation"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        digest_writing [label="5. digest-writing\n(marketing-writer)\nBlog post + email +\nsocial media snippets" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 4: Distribution ────────────────────────────────────────
+    subgraph cluster_distribution {
+        label="Phase 4: Distribution"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        save_digest  [label="6. save-digest\n(bash)\nSave to workspace/blog/" fillcolor="#bbdefb"]
+        distribution [label="7. distribution\n(bash)\nCopy to docs/, auto-open\nDisplay checklist" fillcolor="#bbdefb"]
+    }
+
+    // ── Edges ────────────────────────────────────────────────────────
+    start -> git_activity
+    start -> community     [label="parallel"]
+    git_activity     -> session_analysis [label="if include_sessions" style=dashed]
+    git_activity     -> content_strategy
+    session_analysis -> content_strategy [style=dashed]
+    community        -> content_strategy
+
+    content_strategy -> digest_writing
+    digest_writing   -> save_digest
+    save_digest      -> distribution
+    distribution     -> done
+
+    // ── Context ──────────────────────────────────────────────────────
+    subgraph cluster_context {
+        label="Context Variables"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontsize=10
+        node [shape=note fillcolor="#e1bee7" fontsize=9]
+
+        ctx_date    [label="date_range\n(default: last 7 days)"]
+        ctx_repos   [label="repos\n(optional)"]
+        ctx_session [label="include_sessions\n(default: false)"]
+    }
+    ctx_date -> git_activity [style=dotted color="#999999"]
+}

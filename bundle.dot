@@ -1,0 +1,182 @@
+digraph bundle {
+    label="stories bundle\nAutonomous storytelling engine"
+    labelloc=t
+    fontname="Helvetica"
+    fontsize=16
+    rankdir=TB
+    compound=true
+    newrank=true
+    source_hash="manual-20260407"
+    node [fontname="Helvetica" fontsize=11 style="rounded,filled"]
+    edge [fontname="Helvetica" fontsize=9 color="#666666"]
+
+    // ── Root bundle ──────────────────────────────────────────────────
+    root [label="stories\nv1.0.0\n(bundle.md)" shape=box fillcolor="#80cbc4"]
+
+    // ── External reference ───────────────────────────────────────────
+    ext_foundation [label="amplifier-foundation\n(external)" shape=box style="rounded,filled,dashed" fillcolor="#f5f5f5" color="red" fontcolor="#666666"]
+    root -> ext_foundation [style=dashed color="red" label="includes"]
+
+    // ── Behaviors ────────────────────────────────────────────────────
+    subgraph cluster_behaviors {
+        label="Behaviors"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        beh_stories [label="stories-behavior\nv1.0.0\n(behaviors/stories.yaml)" shape=box fillcolor="#e0f2f1"]
+    }
+    root -> beh_stories [label="includes"]
+
+    // ── Agents ───────────────────────────────────────────────────────
+    subgraph cluster_agents {
+        label="Agents (11)"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        ag_storyteller       [label="storyteller"            shape=box fillcolor="#c8e6c9"]
+        ag_researcher        [label="story-researcher"       shape=box fillcolor="#c8e6c9"]
+        ag_strategist        [label="content-strategist"     shape=box fillcolor="#c8e6c9"]
+        ag_tech_writer       [label="technical-writer"       shape=box fillcolor="#c8e6c9"]
+        ag_mkt_writer        [label="marketing-writer"       shape=box fillcolor="#c8e6c9"]
+        ag_exec_briefer      [label="executive-briefer"      shape=box fillcolor="#c8e6c9"]
+        ag_community_mgr     [label="community-manager"      shape=box fillcolor="#c8e6c9"]
+        ag_release_mgr       [label="release-manager"        shape=box fillcolor="#c8e6c9"]
+        ag_case_study        [label="case-study-writer"      shape=box fillcolor="#c8e6c9"]
+        ag_data_analyst      [label="data-analyst"           shape=box fillcolor="#c8e6c9"]
+        ag_content_adapter   [label="content-adapter"        shape=box fillcolor="#c8e6c9"]
+    }
+    beh_stories -> ag_storyteller     [style=dotted]
+    beh_stories -> ag_researcher      [style=dotted]
+    beh_stories -> ag_strategist      [style=dotted]
+    beh_stories -> ag_tech_writer     [style=dotted]
+    beh_stories -> ag_mkt_writer      [style=dotted]
+    beh_stories -> ag_exec_briefer    [style=dotted]
+    beh_stories -> ag_community_mgr   [style=dotted]
+    beh_stories -> ag_release_mgr     [style=dotted]
+    beh_stories -> ag_case_study      [style=dotted]
+    beh_stories -> ag_data_analyst    [style=dotted]
+    beh_stories -> ag_content_adapter [style=dotted]
+
+    // ── Recipes ──────────────────────────────────────────────────────
+    subgraph cluster_recipes {
+        label="Recipes (4)"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        rec_case_study [label="session-to-case-study\n4 steps, staged" shape=component fillcolor="#fff9c4"]
+        rec_changelog  [label="git-tag-to-changelog\n11 steps, staged" shape=component fillcolor="#fff9c4"]
+        rec_digest     [label="weekly-digest\n7 steps"              shape=component fillcolor="#fff9c4"]
+        rec_blog       [label="blog-post-generator\n7 steps"       shape=component fillcolor="#fff9c4"]
+    }
+    beh_stories -> rec_case_study [style=dotted]
+    beh_stories -> rec_changelog  [style=dotted]
+    beh_stories -> rec_digest     [style=dotted]
+    beh_stories -> rec_blog       [style=dotted]
+
+    // ── Tools / Modules ──────────────────────────────────────────────
+    subgraph cluster_tools {
+        label="Tools (6)"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        tool_analyze    [label="analyze_sessions.py"  shape=box fillcolor="#bbdefb"]
+        tool_dashboard  [label="create_dashboard.py"  shape=box fillcolor="#bbdefb"]
+        tool_deckfix    [label="deck-style-fix.py"    shape=box fillcolor="#bbdefb"]
+        tool_html2pptx  [label="html2pptx.py"         shape=box fillcolor="#bbdefb"]
+        tool_pptx2img   [label="pptx2images.py"       shape=box fillcolor="#bbdefb"]
+        tool_verify     [label="pptx_verify.py"       shape=box fillcolor="#bbdefb"]
+    }
+    root -> tool_analyze   [style=dotted color="#999999"]
+    root -> tool_dashboard [style=dotted color="#999999"]
+    root -> tool_deckfix   [style=dotted color="#999999"]
+    root -> tool_html2pptx [style=dotted color="#999999"]
+    root -> tool_pptx2img  [style=dotted color="#999999"]
+    root -> tool_verify    [style=dotted color="#999999"]
+
+    // ── Context Files ────────────────────────────────────────────────
+    subgraph cluster_context {
+        label="Context Files (10)"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        ctx_instructions [label="storyteller-instructions.md" shape=note fillcolor="#e1bee7"]
+        ctx_ppt_template [label="powerpoint-template.md"      shape=note fillcolor="#e1bee7"]
+        ctx_pres_styles  [label="presentation-styles.md"      shape=note fillcolor="#e1bee7"]
+        ctx_responsive   [label="responsive-design.md"        shape=note fillcolor="#e1bee7"]
+
+        subgraph cluster_archetypes {
+            label="archetypes/ (6)"
+            style=filled
+            fillcolor="#f3e5f5"
+            color="#ce93d8"
+
+            arch_community  [label="community-showcase"       shape=note fillcolor="#e1bee7"]
+            arch_feature    [label="feature-journey"          shape=note fillcolor="#e1bee7"]
+            arch_psi        [label="problem-solution-impact"  shape=note fillcolor="#e1bee7"]
+            arch_release    [label="release-announcement"     shape=note fillcolor="#e1bee7"]
+            arch_tech       [label="technical-deep-dive"      shape=note fillcolor="#e1bee7"]
+            arch_velocity   [label="velocity-metrics"         shape=note fillcolor="#e1bee7"]
+        }
+    }
+    root -> ctx_instructions [label="@mention" style=dotted color="#999999"]
+
+    // ── Workspace Templates ──────────────────────────────────────────
+    subgraph cluster_workspace {
+        label="Workspace Templates"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=12
+
+        ws_docx [label="docx/" shape=folder fillcolor="#eceff1"]
+        ws_pdf  [label="pdf/"  shape=folder fillcolor="#eceff1"]
+        ws_pptx [label="pptx/" shape=folder fillcolor="#eceff1"]
+        ws_xlsx [label="xlsx/" shape=folder fillcolor="#eceff1"]
+    }
+
+    // ── Summary ──────────────────────────────────────────────────────
+    summary [label="stories bundle summary\n11 agents | 6 tools | 4 recipes | 10 context files\nExternals: amplifier-foundation" shape=box style="rounded,filled" fillcolor="#eceff1" fontsize=10]
+    root -> summary [style=invis]
+
+    // ── Legend ────────────────────────────────────────────────────────
+    subgraph cluster_legend {
+        label="Legend"
+        style=filled
+        fillcolor="#f5f5f5"
+        color="#cccccc"
+        fontname="Helvetica"
+        fontsize=10
+
+        node [width=1.8 fontsize=9]
+        leg_bundle  [label="Bundle"          shape=box       fillcolor="#80cbc4"]
+        leg_behav   [label="Behavior"        shape=box       fillcolor="#e0f2f1"]
+        leg_agent   [label="Agent"           shape=box       fillcolor="#c8e6c9"]
+        leg_tool    [label="Tool / Module"   shape=box       fillcolor="#bbdefb"]
+        leg_recipe  [label="Recipe"          shape=component fillcolor="#fff9c4"]
+        leg_context [label="Context File"    shape=note      fillcolor="#e1bee7"]
+        leg_ext     [label="External (hidden cost)" shape=box style="rounded,filled,dashed" fillcolor="#f5f5f5" color="red"]
+
+        leg_bundle  -> leg_behav   [style=invis]
+        leg_behav   -> leg_agent   [style=invis]
+        leg_agent   -> leg_tool    [style=invis]
+        leg_tool    -> leg_recipe  [style=invis]
+        leg_recipe  -> leg_context [style=invis]
+        leg_context -> leg_ext     [style=invis]
+    }
+}

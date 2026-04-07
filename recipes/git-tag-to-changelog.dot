@@ -1,0 +1,97 @@
+digraph git_tag_to_changelog {
+    label="git-tag-to-changelog recipe\nComplete release documentation from git tags"
+    labelloc=t
+    fontname="Helvetica"
+    fontsize=14
+    rankdir=TB
+    node [shape=box style="rounded,filled" fillcolor="#E8F0FE" fontname="Helvetica" fontsize=10]
+    edge [fontname="Helvetica" fontsize=9 color="#666666"]
+
+    // ── Start / End ──────────────────────────────────────────────────
+    start [label="Start" shape=ellipse fillcolor="#C8E6C9"]
+    done  [label="Done"  shape=ellipse fillcolor="#FFCDD2"]
+
+    // ── Phase 1: Data Gathering ──────────────────────────────────────
+    subgraph cluster_gather {
+        label="Phase 1: Data Gathering"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        detect_tag      [label="1. detect-tag\n(bash)\nValidate tag, find previous\nExtract versions & range" fillcolor="#bbdefb"]
+        extract_commits [label="2. extract-commits\n(bash)\nParse git log\nCount contributors & files" fillcolor="#bbdefb"]
+    }
+
+    // ── Phase 2: Analysis ────────────────────────────────────────────
+    subgraph cluster_analysis {
+        label="Phase 2: Analysis"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        analyze_commits  [label="3. analyze-commits\n(zen-architect)\nCategorize by type\nIdentify breaking changes" fillcolor="#c8e6c9"]
+        has_breaking     [label="Breaking\nchanges?" shape=diamond fillcolor="#FFF9C4"]
+        analyze_breaking [label="4. analyze-breaking\n(explorer)\nDeep-dive code changes\nMigration complexity" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 3: Documentation ───────────────────────────────────────
+    subgraph cluster_docs {
+        label="Phase 3: Documentation Generation"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        gen_changelog [label="5. generate-changelog\n(integration-specialist)\nKeep-a-Changelog format" fillcolor="#c8e6c9"]
+        gen_release   [label="6. generate-release-notes\n(zen-architect)\nGitHub release notes" fillcolor="#c8e6c9"]
+        gen_migration [label="7. generate-migration-guide\n(integration-specialist)\nStep-by-step migration" fillcolor="#c8e6c9"]
+        gen_blog      [label="8. generate-blog-post\n(zen-architect)\nAnnouncement blog post" fillcolor="#c8e6c9"]
+        gen_social    [label="9. generate-social-media\n(zen-architect)\nTwitter, LinkedIn, Mastodon" fillcolor="#c8e6c9"]
+    }
+
+    // ── Phase 4: Finalization ────────────────────────────────────────
+    subgraph cluster_finalize {
+        label="Phase 4: Finalization"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+
+        save_files [label="10. save-files\n(bash)\nWrite all artifacts\nto output directory" fillcolor="#bbdefb"]
+        create_pr  [label="11. create-pr\n(bash)\nCreate branch, commit\nPush & open PR" fillcolor="#bbdefb"]
+    }
+
+    // ── Edges ────────────────────────────────────────────────────────
+    start           -> detect_tag
+    detect_tag      -> extract_commits
+    extract_commits -> analyze_commits
+    analyze_commits -> has_breaking
+    has_breaking    -> analyze_breaking [label="yes"]
+    has_breaking    -> gen_changelog    [label="no"]
+    analyze_breaking -> gen_changelog
+
+    gen_changelog -> gen_release
+    gen_release   -> gen_migration [label="if breaking" style=dashed]
+    gen_release   -> gen_blog      [label="if enabled"]
+    gen_blog      -> gen_social    [label="if enabled"]
+    gen_migration -> gen_blog      [style=dashed]
+    gen_social    -> save_files
+    gen_release   -> save_files    [style=dotted color="#cccccc"]
+
+    save_files -> create_pr [label="if !skip_pr"]
+    save_files -> done       [style=dotted color="#cccccc"]
+    create_pr  -> done
+
+    // ── Context ──────────────────────────────────────────────────────
+    subgraph cluster_context {
+        label="Context Variables"
+        style=filled
+        fillcolor="#f9f9f9"
+        color="#cccccc"
+        fontsize=10
+        node [shape=note fillcolor="#e1bee7" fontsize=9]
+
+        ctx_tag  [label="tag_name\n(required)"]
+        ctx_repo [label="repo_path\n(optional)"]
+        ctx_out  [label="output_dir\n(optional)"]
+    }
+    ctx_tag -> detect_tag [style=dotted color="#999999"]
+}
