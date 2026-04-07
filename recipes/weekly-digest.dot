@@ -1,0 +1,54 @@
+// This recipe gathers a week's worth of project activity, writes a friendly summary, and publishes it for the team.
+digraph weekly_digest {
+    rankdir=TB
+    fontname="Helvetica"
+    fontsize=12
+    label="Weekly Digest\nGathers what happened this week, writes a summary, and shares it with the team"
+    labelloc=t
+    labeljust=c
+    compound=true
+    nodesep=0.6
+    ranksep=0.7
+    bgcolor="white"
+    source_hash="37f350dd45728b534ffd450947f861408fb8f81b22fe19af09d7df3759270ffd"
+
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded"]
+    edge [fontname="Helvetica", fontsize=9]
+
+    start [label="Start", shape=oval, fillcolor="#e0e0e0"]
+    done  [label="Done!", shape=oval, fillcolor="#e0e0e0"]
+
+    step_git_activity [label="Scan All Repos\n\"What changed this week?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:story-researcher"]
+    cond_step_session_analysis [label="Include usage\ndata?", shape=diamond, fillcolor="#fff9c4"]
+    step_session_analysis [label="Review Usage Patterns\n\"How are people using it?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:data-analyst"]
+    step_community_highlights [label="Spot Community Buzz\n\"Who's building cool stuff?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:community-manager"]
+    step_content_strategy [label="Plan the Story\n\"What's worth highlighting?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:content-strategist"]
+    step_digest_writing [label="Write the Digest\n\"Put it all together\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:marketing-writer"]
+    step_save_digest [label="Save the File\n\"Store the finished digest\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  # Create directories mkdir -p workspace/blog  # Generate filename with current da"]
+    step_distribution [label="Publish & Share\n\"Post it for the team\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  DIGEST_FILE='{{digest_file_info.digest_file}}'  # Create blog directory in docs i"]
+
+    start -> step_git_activity
+    step_git_activity -> cond_step_session_analysis
+    cond_step_session_analysis -> step_session_analysis [label="include_sessions == true"]
+    step_git_activity -> step_community_highlights
+    step_community_highlights -> step_content_strategy
+    step_content_strategy -> step_digest_writing
+    step_digest_writing -> step_save_digest
+    step_save_digest -> step_distribution
+    cond_step_session_analysis -> step_community_highlights [label="skip", style=dashed]
+    step_distribution -> done
+
+    subgraph cluster_legend {
+        label="Legend\n\"What the shapes mean\""
+        style="filled,rounded"
+        fillcolor="white"
+        color="#cccccc"
+        fontsize=10
+        node [shape=box, fontsize=9, width=1.6]
+        leg_bash [label="Script Step", shape=box, fillcolor="#bbdefb"]
+        leg_agent [label="AI Agent Step", shape=box, fillcolor="#c8e6c9"]
+        leg_cond [label="Condition", shape=diamond, fillcolor="#fff9c4"]
+        leg_start [label="Start / End", shape=oval, fillcolor="#e0e0e0"]
+        leg_bash -> leg_agent -> leg_cond -> leg_start [style=invis]
+    }
+}
