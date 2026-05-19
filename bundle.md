@@ -24,7 +24,7 @@ Create professional presentations, documents, and content across multiple format
 - **Word** - Technical docs, proposals, case studies
 - **PDF** - Executive one-pagers and summaries
 
-### Specialist Agents (11)
+### Specialist Agents (12)
 - **storyteller** - Primary agent for creating presentations
 - **story-researcher** - Automated data gathering
 - **content-strategist** - Story selection and planning
@@ -36,6 +36,7 @@ Create professional presentations, documents, and content across multiple format
 - **data-analyst** - Data transformation and visualization
 - **content-adapter** - Format and audience transformation
 - **community-manager** - Community engagement content
+- **evaluation-visualizer** - Self-contained HTML dashboards from evaluation results
 
 ### Automated Workflows (4 Recipes)
 - **session-to-case-study** - Turn sessions into shareable content
