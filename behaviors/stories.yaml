@@ -3,7 +3,7 @@ bundle:
   version: 1.0.0
   description: Story creation agents and content generation capabilities
 
-# All 11 specialist agents - using include pattern for proper prefixing
+# All 12 specialist agents - using include pattern for proper prefixing
 agents:
   include:
     - stories:storyteller
@@ -17,6 +17,7 @@ agents:
     - stories:case-study-writer
     - stories:data-analyst
     - stories:content-adapter
+    - stories:evaluation-visualizer
 
 # Recipes for automated workflows
 recipes:

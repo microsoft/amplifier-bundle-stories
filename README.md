@@ -22,7 +22,7 @@ amplifier bundle use stories
 | **Word** | Technical documentation, proposals |
 | **PDF** | Final deliverables, archival |
 
-### Specialist Agents (11)
+### Specialist Agents (12)
 
 | Agent | Purpose |
 |-------|---------|
@@ -37,6 +37,7 @@ amplifier bundle use stories
 | `stories:data-analyst` | Data transformation and visualization |
 | `stories:content-adapter` | Format and audience transformation |
 | `stories:community-manager` | Community engagement content |
+| `stories:evaluation-visualizer` | Self-contained HTML evaluation dashboards from run results |
 
 ### Automated Workflows (4 Recipes)
 
@@ -55,6 +56,7 @@ amplifier bundle use stories
 "Create a PowerPoint about shadow environments"
 "Make an Excel dashboard showing adoption metrics"
 "Write a case study about the authentication refactor"
+"Create me an evaluation dashboard using the results at <path> that explains to me the results."
 ```
 
 ### Automated (Recipes)
