@@ -7,8 +7,7 @@ Create professional presentations, documents, and content across multiple format
 ## Installation
 
 ```bash
-amplifier bundle add git+https://github.com/microsoft/amplifier-bundle-stories@main
-amplifier bundle use stories
+amplifier bundle add git+https://github.com/microsoft/amplifier-bundle-stories@main#subdirectory=behaviors/stories.yaml --app
 ```
 
 ## What's Included
