@@ -1,11 +1,62 @@
+# --- Dependency manifest (contract: recipe-dependency-manifest.v1) ----------
+# schema_version 2 makes this recipe portable: every `agent:` reference below
+# resolves ONLY from the declared closure here, never from the calling
+# session's agent map. A caller that lacks these agents can still run it.
+#
+# The steps reference these agents by bare name (`story-researcher`, not
+# `stories:story-researcher`). Under schema_version 2 a bare reference is
+# resolved against the declared closure and is an error if nothing in the
+# closure supplies it -- it is NOT a fall-through to the calling session.
+# There is exactly one dependency here, so no bare name is ambiguous.
+#
+# Pinned to `@main`. Foundation fetches a ref with `git clone --branch`, which
+# accepts a branch or a tag but NOT a commit sha -- a sha pin is rejected with
+# "Remote branch <sha> not found in upstream origin" (measured). This repo
+# carries no tags, so `@main` is the most specific pin a `source:` can express
+# for it today; origin/main is 4d37a8f at the time of this migration.
+schema_version: 2
+
+dependencies:
+  - source: "git+https://github.com/microsoft/amplifier-bundle-stories@main"
+    kind: bundle
+    required_agents:
+      - "stories:story-researcher"
+      - "stories:content-strategist"
+      - "stories:case-study-writer"
+# ---------------------------------------------------------------------------
+
 name: "session-to-case-study"
 description: "Convert completed Amplifier session files into compelling case studies in Word format"
-version: "1.0.0"
+version: "1.1.0"
 author: "amplifier-stories"
 tags: ["case-study", "documentation", "storytelling", "session-analysis"]
 
 # Recipe for automatically generating case studies from session data
 # Takes an events.jsonl file and produces a professional Word document
+#
+# CHANGELOG:
+# v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
+#          from ANY session bundle, not only one that already carries its
+#          agents. No agent reference was changed.
+#        - Fix a live-confirmed PRE-EXISTING defect (present since v1.0.0, not
+#          introduced by the v2 migration): all three conditional steps used
+#          `{{strategy_plan}} contains '...'`, but the engine's condition
+#          evaluator has no `contains` operator -- it supports only
+#          == != < > >= <= and/or/not/parens. Every run therefore died at the
+#          `writing` step with "Invalid expression: Unexpected token 'contains'
+#          at position 1", so the recipe could never reach ANY of its terminal
+#          steps. Fixed by parsing the strategy step's JSON (`parse_json: true`,
+#          the same pattern blog-post-generator.yaml already uses for its
+#          planning step) and testing the boolean the prompt already asks for:
+#          `{{strategy_plan.worthy}}` / `not {{strategy_plan.worthy}}`.
+#        - Fix a SECOND pre-existing defect the first fix made reachable for the
+#          first time: `not-worthy-report` printed the strategy payload with
+#          `echo "{{strategy_plan}}"`. That payload is JSON -- it contains
+#          double quotes and parentheses -- so the interpolated command died
+#          with `/bin/bash: syntax error near unexpected token '('` (exit 2).
+#          Replaced with a quoted heredoc, the pattern weekly-digest.yaml
+#          already uses for its digest body.
+# v1.0.0 - Initial recipe
 #
 # Usage:
 #   amplifier run "execute session-to-case-study.yaml with session_file=~/.amplifier/sessions/2026-01-15/events.jsonl"
@@ -103,6 +154,7 @@ steps:
       
       If not worthy, explain why and suggest what would make it case-study material.
     output: "strategy_plan"
+    parse_json: true
     timeout: 600
   
   # ============================================
@@ -111,7 +163,7 @@ steps:
   - id: "writing"
     agent: "case-study-writer"
     mode: "CREATE"
-    condition: "{{strategy_plan}} contains 'worthy: true' or {{strategy_plan}} contains 'worthy\":true'"
+    condition: "{{strategy_plan.worthy}}"
     prompt: |
       Create a compelling case study from this session data.
       
@@ -210,7 +262,7 @@ steps:
   # ============================================
   - id: "finalize"
     type: "bash"
-    condition: "{{strategy_plan}} contains 'worthy: true' or {{strategy_plan}} contains 'worthy\":true'"
+    condition: "{{strategy_plan.worthy}}"
     command: |
       # Construct the file path
       SESSION_FILE="{{session_file}}"
@@ -272,14 +324,20 @@ steps:
   # ============================================
   - id: "not-worthy-report"
     type: "bash"
-    condition: "{{strategy_plan}} contains 'worthy: false' or {{strategy_plan}} contains 'worthy\":false'"
+    condition: "not {{strategy_plan.worthy}}"
     command: |
       echo "ℹ️  Session Analysis Complete"
       echo ""
       echo " This session was analyzed but does not meet case study criteria."
       echo ""
       echo "Strategy Assessment:"
-      echo "{{strategy_plan}}"
+      # Quoted heredoc, NOT echo "...": the strategy payload is JSON and
+      # contains double quotes and parentheses, which break an interpolated
+      # `echo "..."` with a shell syntax error. Same pattern weekly-digest.yaml
+      # uses for its digest body.
+      cat <<'STRATEGY_EOF'
+      {{strategy_plan}}
+      STRATEGY_EOF
       echo ""
       echo " Tip: Case-study worthy sessions typically have:"
       echo "   • 10+ tool calls"
