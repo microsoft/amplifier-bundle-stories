@@ -1,11 +1,52 @@
+# --- Dependency manifest (contract: recipe-dependency-manifest.v1) ----------
+# schema_version 2 makes this recipe portable: every `agent:` reference below
+# resolves ONLY from the declared closure here, never from the calling
+# session's agent map. A caller that lacks these agents can still run it.
+#
+# Pinned to `@main`. Foundation fetches a ref with `git clone --branch`, which
+# accepts a branch or a tag but NOT a commit sha -- a sha pin is rejected with
+# "Remote branch <sha> not found in upstream origin" (measured). This repo
+# carries no tags, so `@main` is the most specific pin a `source:` can express
+# for it today; origin/main is 4d37a8f at the time of this migration.
+schema_version: 2
+
+dependencies:
+  - source: "git+https://github.com/microsoft/amplifier-bundle-stories@main"
+    kind: bundle
+    required_agents:
+      - "stories:story-researcher"
+      - "stories:data-analyst"
+      - "stories:community-manager"
+      - "stories:content-strategist"
+      - "stories:marketing-writer"
+# ---------------------------------------------------------------------------
+
 name: "weekly-digest"
 description: "Generate comprehensive weekly digests of Amplifier ecosystem activity including commits, PRs, releases, community highlights, and key metrics"
-version: "1.0.0"
+version: "1.1.0"
 author: "Amplifier Recipes Collection"
 tags: ["community", "digest", "publishing", "automation", "marketing"]
 
 # Weekly Ecosystem Digest Recipe
 # ==============================
+#
+# CHANGELOG:
+# v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
+#          from ANY session bundle, not only one that already carries its
+#          agents.
+#        - Corrected five STALE agent references. Every step referenced
+#          `foundation:<name>`, but amplifier-foundation ships none of these
+#          agents -- at v2.1.2 it supplies bug-hunter, bundle-design-expert,
+#          ecosystem-expert, explorer, file-ops, foundation-expert, git-ops,
+#          integration-specialist, modular-builder, post-task-cleanup,
+#          security-guardian, session-analyst, shell-exec, test-coverage,
+#          web-research, zen-architect, and nothing resembling these five.
+#          story-researcher, data-analyst, community-manager,
+#          content-strategist and marketing-writer are THIS bundle's own
+#          agents, so the references are corrected to `stories:<name>`.
+#          No agent was renamed to dodge a missing one -- each corrected
+#          reference names the agent the step was always describing.
+# v1.0.0 - Initial recipe
 #
 # Automatically generates a comprehensive weekly digest of ecosystem activity
 # Perfect for maintaining regular communication with the community
@@ -59,7 +100,7 @@ steps:
   # Step 1: Git Activity Scan
   # ==========================================================================
   - id: "git-activity"
-    agent: "foundation:story-researcher"
+    agent: "stories:story-researcher"
     mode: "ANALYZE"
     prompt: |
       Scan the Amplifier ecosystem for activity over {{date_range}}.
@@ -97,7 +138,7 @@ steps:
   # ==========================================================================
   - id: "session-analysis"
     condition: "{{include_sessions}} == true"
-    agent: "foundation:data-analyst"
+    agent: "stories:data-analyst"
     mode: "ANALYZE"
     prompt: |
       Analyze Amplifier session data from {{date_range}} to understand usage patterns.
@@ -133,7 +174,7 @@ steps:
   # Step 3: Community Highlights
   # ==========================================================================
   - id: "community-highlights"
-    agent: "foundation:community-manager"
+    agent: "stories:community-manager"
     mode: "ANALYZE"
     prompt: |
       Discover and highlight community activity around Amplifier over {{date_range}}.
@@ -177,7 +218,7 @@ steps:
   # Step 4: Content Strategy
   # ==========================================================================
   - id: "content-strategy"
-    agent: "foundation:content-strategist"
+    agent: "stories:content-strategist"
     mode: "ANALYZE"
     prompt: |
       Review all gathered data and determine the content strategy for this week's digest.
@@ -220,7 +261,7 @@ steps:
   # Step 5: Digest Writing
   # ==========================================================================
   - id: "digest-writing"
-    agent: "foundation:marketing-writer"
+    agent: "stories:marketing-writer"
     mode: "CREATE"
     prompt: |
       Write the Amplifier Weekly Digest based on the content strategy and gathered data.

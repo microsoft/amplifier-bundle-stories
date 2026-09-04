@@ -1,11 +1,38 @@
+# --- Dependency manifest (contract: recipe-dependency-manifest.v1) ----------
+# schema_version 2 makes this recipe portable: every `agent:` reference below
+# resolves ONLY from the declared closure here, never from the calling
+# session's agent map. A caller that lacks these agents can still run it.
+#
+# Pinned to the released tag `v2.1.2`. Foundation fetches a ref with
+# `git clone --branch`, which accepts a branch or a tag but NOT a commit sha,
+# so a tag is the most immutable pin a `source:` can currently express.
+schema_version: 2
+
+dependencies:
+  - source: "git+https://github.com/microsoft/amplifier-foundation@v2.1.2"
+    kind: bundle
+    required_agents:
+      - "foundation:zen-architect"
+      - "foundation:explorer"
+      - "foundation:integration-specialist"
+# ---------------------------------------------------------------------------
+
 name: "git-tag-to-changelog"
 description: "Generate complete release documentation from git tags including changelog, release notes, and migration guides"
-version: "1.0.0"
+version: "1.1.0"
 author: "Amplifier Recipes Collection"
 tags: ["release", "changelog", "documentation", "git", "automation"]
 
 # Git Tag to Changelog Recipe
 # ===========================
+#
+# CHANGELOG:
+# v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
+#          from ANY session bundle, not only one that already carries its
+#          agents. All three referenced agents (zen-architect, explorer,
+#          integration-specialist) were verified to exist in
+#          amplifier-foundation@v2.1.2; no agent reference was changed.
+# v1.0.0 - Initial recipe
 #
 # Automatically generates comprehensive release documentation when a git tag is created.
 #
