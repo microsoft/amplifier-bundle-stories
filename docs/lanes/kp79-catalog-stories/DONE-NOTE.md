@@ -234,12 +234,29 @@ Procedure 4 cannot be, live — the merge is the manager's stage.
    full suite here    :  70 passed
    ```
 
-   **HONEST LIMIT, stated rather than skipped past:** this repo's test environment cannot import
-   `amplifier_module_tool_delegate` (its native deps are absent there), so the renderer cannot be executed
-   **in-process at test time**. The capture anchor is the closest deterministic substitute. The real pipeline
-   *was* executed — four times, for the A/B pairs — and is re-runnable at $0 via
-   `evidence/render-catalog.sh`. What is proven in-repo is: *what this repo would render is byte-identical to
-   what the real pipeline did render.* What is not proven in-repo is a fresh live render on every test run.
+   **AND THE RENDERER NOW RUNS ON EVERY TEST RUN.** `tests/test_live_render.py` closes the last gap. The two
+   guards above check the *text* and compare it to a *capture* — both can pass while the live pipeline emits
+   something else, because neither runs the renderer. This one does: it locates an interpreter that can import
+   `amplifier_module_tool_delegate` (this one, or the `amplifier` CLI's own — the system interpreter cannot,
+   its native deps are absent, so the test finds the CLI's), builds a `DelegateTool` over **this repo's**
+   agents, and reads its **`description` property** — the same property the runtime reads to put the catalog
+   in the head of every request. The agent-row join under test is the **shipped code**, not a copy of it.
+
+   It **fails** rather than skips if no such interpreter exists, naming the fix; a skip is a vacuous pass,
+   which is the failure mode the rest of this suite exists to catch. `AMPLIFIER_SKIP_LIVE_RENDER=1` opts out
+   visibly.
+
+   ```
+   live-render suite, merge-base 1f2019e :  2 failed, 2 passed
+   live-render suite, this branch        :  4 passed
+   ```
+
+   The failing two on stock are exactly the substantive ones: *rows meet the standard as RENDERED*, and
+   *rendered slice size is the published figure*. One of them re-derives **4,876 B from a live render on every
+   run** — so the number published in this note is now regression-guarded, not merely recorded.
+
+   **Three independent paths agree on 4,876 B:** the scratch-session CLI render, the committed capture, and
+   the in-process live render.
 
    That is the fail-before/pass-after the LANDING STAGE clause asks for, on the rendering property itself.
    It also *keeps* the property: any future agent whose rendered row regresses turns the suite red.
