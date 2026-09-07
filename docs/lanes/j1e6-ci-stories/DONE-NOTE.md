@@ -68,6 +68,35 @@ item, re-read the errata immediately before filing one.** The list you planned a
 stale by the time you file, and the count is the whole finding — "second lane" reads as a
 coincidence, "six of six" reads as a systematic defect.
 
+### 2.1 `BLOCKED.md` filed after the fact, on the owner's direct instruction
+
+The owner directed that Procedure 1 be discharged literally. `BLOCKED.md` therefore exists
+at `docs/lanes/j1e6-ci-stories/BLOCKED.md` and is committed. It names the reason (the
+refused claim), records both fenced-verb refusals verbatim, and **deliberately does not
+claim the outcome was unreachable** — that would be a false statement in the repository,
+and the outcome was reached.
+
+Both terminal verbs were measured, not assumed:
+
+```
+work_release(id="model_performance-j1e6")
+→ not currently holding 'model_performance-j1e6' in this session --
+  refusing to release an item this session did not claim
+
+work_resolve(id="model_performance-j1e6", reason=...)
+→ not currently holding 'model_performance-j1e6' in this session --
+  refusing to resolve an item this session did not claim
+```
+
+So Procedure 5's terminal verb and branch C's terminal verb are **both unavailable** to a
+lane whose claim was refused. Branch C cannot be fully executed here by construction; the
+`BLOCKED.md` half is discharged, the `work_release` half is not executable. That is the
+defect, stated plainly rather than worked around.
+
+The item's own state, re-read fresh rather than remembered: `STATUS: resolved`,
+`HOLDER: agent-spark-1-1101253`, `UPDATED: 2026-09-07T18:14:01+00:00` — resolved 32 minutes
+before this lane started, by the holder, over `amplifier-bundle-wayfinder`.
+
 ## 3. Deliverables
 
 | # | Deliverable | State |
