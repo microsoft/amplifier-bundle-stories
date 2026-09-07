@@ -20,7 +20,56 @@ The sweep's premise was that bundles ship bloated descriptions stuffed with `<ex
 
 So there was nothing to strip. What there was, was **twelve near-interchangeable routing rows**: 11 of 12 shared the literal shape `"<Role> specialist - creates <content>"`, and **0 of 12** carried any `DO NOT USE WHEN`. Meeting the standard on this repo can only add bytes. **Byte reduction was the sweep's evidence, not its purpose** — the deliverable is a routing table a model can actually route on.
 
-**Verdict: DONE.** All deliverables satisfied; none NOT-POSSIBLE; the cap did not bind (all work is $0). Outcome **branch A**, satisfied at the landing stage — demonstrated and shipped as a draft PR; the manager merges.
+**Verdict: branch A, with ONE deliverable clause recorded NOT-POSSIBLE.** The cap never bound (every
+deliverable here is $0, so there is no unspendable residue to state). Nine of ten deliverables are DONE;
+the readiness half of one is structurally unfirable and is dispositioned below rather than glossed.
+
+## DELIVERABLE DISPOSITION — DONE / NOT-POSSIBLE-with-reason
+
+Each deliverable resolves independently, per the DELIVERABLES header.
+
+| # | deliverable | disposition |
+|---|---|---|
+| 1 | Every description meeting the standard | **DONE** — 12/12 trigger-first, explicit `DO NOT USE WHEN`, 293–446 chars, zero `<example>`/`<commentary>`. 0 skills in repo, so the skill clause is vacuous. |
+| 2 | Fidelity table | **DONE** — every stock fact audited; 1 absence restored (+33 B), 2 named non-restorations, 0 unexplained losses. |
+| 3 | Before/after char counts, per item and repo total | **DONE** — 1,484 → 4,505 (+3,021). |
+| 4 | Delegate catalog rendered before/after, bytes quoted, with the control | **DONE** — slice 1,857 → 4,876 B (+3,019); 24 of 25 other bundles at delta 0; render diff = exactly one 12-line hunk. |
+| 5 | `validate-agents` on the branch, verdict quoted | **DONE** — run on BOTH sides. `PASS WITH WARNINGS` → `PASS WITH WARNINGS`, 0 errors both; warnings 14 → 12. Explicitly NOT claimed as FAIL → PASS. |
+| 6 | CI green where the repo has CI; where none, say so plainly | **DONE via the second branch** — the repo has none; stated plainly, with what `gh pr checks` actually returns (below). |
+| 7 | Bodies byte-identical | **DONE** — 12/12 by md5 of everything after the second `---`. |
+| 8 | DONE-NOTE at the lane artifact root | **DONE** — this file, `docs/lanes/kp79-catalog-stories/DONE-NOTE.md`. |
+| 9 | DRAFT PR, not merged | **DONE** — PR #14, `isDraft: true`, `merged: false`. |
+| **10** | **…"marked ready when its own CI is green"** (GOAL.md:72, second clause) | **NOT-POSSIBLE — see reason below.** |
+
+### Deliverable 10 — NOT-POSSIBLE, and what WAS executed first
+
+**EXECUTED:** the PR was created (`gh pr create --draft`), 20 files published, 12 descriptions rewritten and
+verified from the remote, the catalog A/B rendered with its control, `validate-agents` run on both the
+merge-base and the branch, the suite run on both sides, and the readiness flag was in fact toggled twice
+(`gh pr ready` 18:15Z, `gh pr ready --undo` 18:27Z) — so the *mechanism* was exercised and proven to work.
+
+**WHY THE CONDITION CANNOT BE MET:** the clause makes readiness contingent on *"its own CI"* being green.
+`amplifier-bundle-stories` has none, and this is a property of the repository, not of the branch:
+
+```
+.github on main                  → HTTP 404
+.github on lane/kp79-...         → HTTP 404
+actions/workflows                → total_count: 0
+actions/runs (ever, any branch)  → total_count: 0
+```
+
+Zero workflow runs in the repository's entire history. The antecedent is **permanently false**, so the
+condition can never be satisfied — not by more work, not by more spend. **This is NOT a cap-bound
+NOT-POSSIBLE** (the cap is $0 and never bound); it is structural, and it is a **defect in the goal text**,
+reported per the goal's own instruction rather than absorbed. The one-clause patch that would close it is
+shipped as an artifact at `lanes/kp79-catalog-stories/GOAL-TEMPLATE-PATCH.md`.
+
+**WHAT THE PR STATE IS, AND WHY:** DRAFT. Branch A requires *"(as a draft PR on the module's origin)"* and
+`GOAL.md` names *"draft"* as the terminal artifact state four times against one conditional *"marked ready"*.
+The flag was moved to ready on an owner ruling and returned to draft on the reversing ruling; the full
+transition history is in the lane marker's `publication.pr_state_history`, and the fact that the history
+contains a ready transition is recorded rather than erased.
+
 
 ---
 
@@ -195,7 +244,13 @@ The 12 residual `NO_TOOLS_SECTION` warnings are **pre-existing and deliberately 
 
 - **Tests: 8 passed, before and after.** `python3 -m pytest tests/ -q` → `8 passed` on the branch **and** on the merge-base extract. `tests/test_storyteller_instructions.sh` → exit 0. Test-neutral, zero new failures.
 - **CHECKED THE TESTS FIRST**, per the dot-graph erratum's cross-cutting warning (11 of its tests asserted `<example>` counts **≥ 2**, which is how #341 never landed there). **That warning does not hold here:** `grep -rn "description\|<example>\|meta:" tests/` returns **nothing**. This repo's tests are description-blind. A third data point that the warning must be *checked*, not assumed.
-- **CI: this repo has NO CI. `.github/` does not exist.** Stated plainly rather than implying a green run that does not exist. The PR therefore cannot be "marked ready when its own CI is green" in the literal sense — it is left as a **draft** with local evidence attached, for the manager to merge.
+- **CI: this repo has NO CI of its own.** `.github/` 404s on `main` and on the branch; `actions/workflows`
+  and `actions/runs` are both `total_count: 0` across the repository's entire history. Stated plainly rather
+  than implying a green run that does not exist. **But not zero checks:** PR #14 carries exactly one
+  check-run and it **passes** — `license/cla` from the `microsoft-github-policy-service` app, an org-level
+  check, not the repo's CI. (The legacy Statuses API reads `pending` only because its `total_count` is 0 —
+  an empty status set, not a queued run.) The readiness clause of GOAL.md:72 is dispositioned
+  **NOT-POSSIBLE** above.
 - **Bodies byte-identical: 12 of 12**, md5 of everything after the second `---` verified against the merge-base. Evidence: `evidence/body-md5-before.txt` and the `body` column above. This is a frontmatter-only change; the only line touched in each file is `  description:`.
 
 ---
