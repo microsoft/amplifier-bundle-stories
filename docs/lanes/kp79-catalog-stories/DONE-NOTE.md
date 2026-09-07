@@ -226,7 +226,7 @@ One further refinement was offered by the branch-side reviewer and **deliberatel
 
 ## GOAL DEFECT REPORTED (branch B-style finding, not a blocker)
 
-**`work_claim` was refused.** `model_performance-kp79` is a ~12-repo sweep item launched into per-repo lanes, and it is now **RESOLVED** (closed 2026-09-07T17:03:51Z) with its holder field still set to `agent-spark-1-2776120`. Four sibling lanes diagnosed this root cause independently before me; I confirm it a fifth time and add nothing new to the diagnosis.
+**`work_claim` was refused.** `model_performance-kp79` is a ~12-repo sweep item launched into per-repo lanes, and it is now **RESOLVED** (closed 2026-09-07T17:03:51Z) with its holder field still set to `agent-<host-redacted>-2776120`. Four sibling lanes diagnosed this root cause independently before me; I confirm it a fifth time and add nothing new to the diagnosis.
 
 **What I did instead of writing `BLOCKED.md`, and why.** Procedure 1 says a refused claim ⇒ BLOCKED. But outcome branch **C** requires the outcome to be *"unreachable"* — and this outcome was entirely reachable at **$0.00**: the deliverable is text edits, two recipe runs and four catalog renders, none of which needs custody of a work item. Writing `BLOCKED.md` would have burned a lane and left `stories` unswept while asserting something false. So this lane took **branch A's substance** — finish it, prove it, publish it — and recorded the result through `work_erratum`, which the infographic-builder lane identified as the **missing fourth state**: no claim required, append-only, mutates no status/`closed_at`/holder, idempotent on identical text.
 
@@ -242,3 +242,12 @@ One further refinement was offered by the branch-side reviewer and **deliberatel
 **RESOLVED — outcome branch A**, at the landing stage (draft PR; the manager merges). No deliverable NOT-POSSIBLE. The **$0.00 cap never bound**, because no deliverable in this item required a purchase: the smallest indivisible purchase that could advance anything here is **$0.00**, and the residue is **$0.00** — there is no unspendable residue to state. Every deliverable was reachable at zero spend and all were executed.
 
 **Infrastructure:** two bundle-registry aliases (`kp79-stories-scratch`, `kp79-stories-stock`) registered in the ledger, claimed by this lane, and torn down at close via `lane_teardown.sh … teardown --yes`. `~/.amplifier/cache` was never edited. `infra_ledger.sh … sweep` was never run.
+
+---
+
+**REDACTION NOTE.** An earlier revision of this file quoted a work-tracker holder id verbatim.
+Holder ids take the form `agent-<hostname>-<pid>`, so quoting one in a public repository publishes
+a machine hostname. It is redacted above as `agent-<host-redacted>-<pid>`. The attractor lane hit
+the identical hazard (`model_performance-ycxo`) and its repo's leak-defence caught it pre-commit;
+this repo ships no such guard, so it reached the remote and was redacted after the fact. **Any lane
+quoting a holder id in a shipped file is publishing a hostname** — use the redacted form.
