@@ -187,6 +187,42 @@ Expected: none absent. **Result: 1 absence found and RESTORED (+33 B); 2 deliber
 
 ---
 
+## RENDERING — what was demonstrated, and where the landing-stage boundary falls
+
+The goal's title is a **live-system statement**: *"the descriptions render on every request."* The goal
+pre-empts exactly this in its own opening clause, and this section is the acknowledgement it asks for:
+
+> **LANDING STAGE.** A deliverable whose FINAL state requires a merge is **DONE AT THE DRAFT PR**… a
+> merged/live-system state can never be your bar: demonstrate the change fail-before/pass-after, ship it as a
+> draft PR… If a deliverable below reads as *"the live system now behaves X"*, satisfy it as *"X is
+> demonstrated and shipped for landing"* **and say so in your DONE-NOTE.**
+
+**Saying so:** the rendering behaviour is **demonstrated and shipped for landing**. It is not, and by
+Procedure 4 cannot be, live — the merge is the manager's stage.
+
+**What WAS demonstrated, through the real pipeline rather than a simulation:**
+
+1. **The renderer is the shipped one.** The delegate catalog is produced by tool-delegate's own `description`
+   property — `amplifier_module_tool_delegate/__init__.py:938`, `f"  - {a['name']}: {a.get('description', …)}"`.
+   Both the BEFORE and AFTER renders came out of that property via `amplifier tool info delegate -b <bundle>`,
+   which performs a real tool mount. No hand-assembled string was measured.
+2. **The BEFORE render reproduces a real session exactly.** The installed cache copy that feeds live sessions
+   (`~/.amplifier/cache/amplifier-bundle-stories-…`) was verified **byte-identical to the merge-base** for all
+   12 agents, `bundle.md` and `behaviors/stories.yaml`. So the 1,857 B stock slice is not a reconstruction —
+   it is what sessions render today, on every request.
+3. **The AFTER rows render through the same pipeline**, from a bundle alias pointing at this branch:
+   `stories:data-analyst: USE WHEN raw metrics must become something a reader can see …`
+   `stories:storyteller: USE WHEN the ask is to tell a story about something or build a deck …`
+4. **Fail-before / pass-after is exercised on the axis the standard governs:** `validate-agents` on the
+   merge-base reports 0/12 with a strong trigger and 0/12 with a `DO NOT USE WHEN`; on the branch, **12/12 and
+   12/12**. Same tool, both sides.
+
+**What was NOT done, and deliberately so:** no production/post-merge token-cost measurement, and no API
+spend. The authority is **$0.00** and states *"No API measurement is authorised."* A post-merge live
+measurement is both unfunded and, per the LANDING STAGE clause, not this lane's bar. The catalog deliverable
+is specified as *"rendered from a **scratch session** BEFORE and AFTER"* — which is what was done, with the
+whole-catalog control.
+
 ## CATALOG MEASUREMENT — rendered before and after, with the control
 
 Rendered from a scratch session with **no LLM call, $0.00**, reproducible via `docs/lanes/kp79-catalog-stories/evidence/render-catalog.sh`.
