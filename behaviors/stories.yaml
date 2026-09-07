@@ -29,3 +29,6 @@ recipes:
     path: stories:recipes/weekly-digest.yaml
   blog-post-generator:
     path: stories:recipes/blog-post-generator.yaml
+
+# SCRATCH ONLY -- deliberate YAML break to prove the bundle-structure job goes RED
+broken: [unterminated
