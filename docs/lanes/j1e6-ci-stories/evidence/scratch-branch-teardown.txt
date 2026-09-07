@@ -1,0 +1,19 @@
+SCRATCH TEARDOWN -- VERIFIED BY REMOTE READ, NOT BY TRUSTING THE SUCCESS MESSAGE
+
+  $ gh pr close 15 --delete-branch
+  ✓ Closed pull request #15 (SCRATCH: red-proof for CI (do not merge))
+  ✓ Deleted branch ci/red-proof-j1e6
+
+That message is a claim. The verification is these two remote reads:
+
+  $ git ls-remote --heads origin ci/red-proof-j1e6
+  (0 lines -- the ref is gone from the remote)
+
+  $ gh pr view 15 --json number,state,headRefName,url
+  PR #15 state=CLOSED head=ci/red-proof-j1e6
+  https://github.com/microsoft/amplifier-bundle-stories/pull/15
+
+A sibling lane on amplifier-bundle-browser-tester recorded that `gh pr close
+--delete-branch` reported the close while its branch deletion aborted on an
+unrelated worktree conflict -- trusting the message there would have left the
+scratch branch on the remote. Hence the read-back.

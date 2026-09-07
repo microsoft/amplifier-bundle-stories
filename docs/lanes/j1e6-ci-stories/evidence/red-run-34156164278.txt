@@ -1,0 +1,100 @@
+RED RUN 34156164278
+https://github.com/microsoft/amplifier-bundle-stories/actions/runs/34156164278
+
+Scratch branch ci/red-proof-j1e6 @ e18f2271914f5ce32d28c8673e0f75e3961f68e0
+Scratch PR #15 -- CLOSED, branch DELETED (verified by `git ls-remote --heads origin
+ci/red-proof-j1e6` returning 0 lines, not by trusting the gh success message).
+
+All four checks RED, each for its OWN deliberate reason. The one that matters for
+the gate is the TEST job: `1 failed, 74 passed` on BOTH Pythons -- the real suite
+collected and executed 74 real tests and one planted test failed. That is a test
+failure, not a setup or lint error, so the red proves the suite is actually wired.
+
+The 74 passing tests include tests/test_live_render.py's 4, which execute the REAL
+delegate renderer. They would have FAILED (that file refuses to skip) if the two
+pinned amplifier-* installs had not worked on the runner -- so this log is also the
+proof that the git-pinned dependency install works in CI.
+
+Verbatim job-log excerpts, timestamps stripped:
+
+==============================================================================
+TESTS (py3.11) -- GENUINE TEST FAILURE INSIDE A SUITE THAT RAN
+==============================================================================
+Downloading pygments (1.2MiB)
+Downloading amplifier-core (8.3MiB)
+   Building amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384
+ Downloaded pydantic-core
+ Downloaded pygments
+ Downloaded amplifier-core
+      Built amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate
+      Built amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384
+Installed 17 packages in 9ms
+............F........................................................... [ 96%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_deliberately_failing_so_the_test_job_goes_red ______________
+tests/test_red_proof_DELETEME.py:15: in test_deliberately_failing_so_the_test_job_goes_red
+    assert 1 == 2, "deliberate failure: proving the CI test job can go red"
+E   AssertionError: deliberate failure: proving the CI test job can go red
+E   assert 1 == 2
+=========================== short test summary info ============================
+FAILED tests/test_red_proof_DELETEME.py::test_deliberately_failing_so_the_test_job_goes_red - AssertionError: deliberate failure: proving the CI test job can go red
+assert 1 == 2
+1 failed, 74 passed in 1.25s
+##[error]Process completed with exit code 1.
+
+==============================================================================
+TESTS (py3.13) -- SAME, ON THE OTHER PYTHON
+==============================================================================
+Downloading pygments (1.2MiB)
+Downloading pydantic-core (2.0MiB)
+Downloading amplifier-core (8.3MiB)
+ Downloaded pygments
+ Downloaded pydantic-core
+ Downloaded amplifier-core
+      Built amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate
+      Built amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384
+Installed 17 packages in 4ms
+............F........................................................... [ 96%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_deliberately_failing_so_the_test_job_goes_red ______________
+tests/test_red_proof_DELETEME.py:15: in test_deliberately_failing_so_the_test_job_goes_red
+    assert 1 == 2, "deliberate failure: proving the CI test job can go red"
+E   AssertionError: deliberate failure: proving the CI test job can go red
+E   assert 1 == 2
+=========================== short test summary info ============================
+FAILED tests/test_red_proof_DELETEME.py::test_deliberately_failing_so_the_test_job_goes_red - AssertionError: deliberate failure: proving the CI test job can go red
+assert 1 == 2
+1 failed, 74 passed in 1.03s
+##[error]Process completed with exit code 1.
+
+==============================================================================
+LINT -- fails for a LINT reason (F401 + F821), separately
+==============================================================================
+  |
+6 | def undefined_name_here() -> str:
+7 |     return this_name_does_not_exist  # ruff F821
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.
+##[error]Process completed with exit code 1.
+
+==============================================================================
+BUNDLE STRUCTURE (YAML) -- fails for a YAML reason, separately
+==============================================================================
+OK  bundle.md  (bundle.name=stories)
+
+1 YAML document(s) parsed.
+
+FAILURES:
+  - behaviors/stories.yaml: while parsing a flow sequence
+  in "<unicode string>", line 34, column 9:
+    broken: [unterminated
+            ^
+expected ',' or ']', but got '<stream end>'
+  in "<unicode string>", line 35, column 1:
+    
+    ^
+##[error]Process completed with exit code 1.
