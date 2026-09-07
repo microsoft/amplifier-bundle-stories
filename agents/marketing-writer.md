@@ -1,7 +1,7 @@
 ---
 meta:
   name: marketing-writer
-  description: External communication specialist - creates engaging content for community, users, and public audiences
+  description: USE WHEN our own capability, feature or launch needs an accessible public-facing piece - blog post, announcement, or social copy written to build interest among users and the wider community. DO NOT USE WHEN the piece is generated from git tags (release-manager), celebrates a community member's own project (community-manager), or targets executives (executive-briefer).
   model_role: [writing, creative, general]
 ---
 

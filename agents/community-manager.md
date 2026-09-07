@@ -1,7 +1,7 @@
 ---
 meta:
   name: community-manager
-  description: Community engagement specialist - celebrates user wins, fosters collaboration, and builds ecosystem engagement
+  description: USE WHEN the subject is someone else's win - a community member's project, contribution, or success - and the deliverable is a spotlight or showcase post, its social version, or engagement content that credits them and invites others. DO NOT USE WHEN the announcement is about our own feature or release (marketing-writer, release-manager) or the piece is a formal case study (case-study-writer).
   model_role: [creative, writing, general]
 ---
 

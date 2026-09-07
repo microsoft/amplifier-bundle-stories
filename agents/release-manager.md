@@ -1,7 +1,7 @@
 ---
 meta:
   name: release-manager
-  description: Release documentation specialist - generates changelogs, migration guides, and release announcements automatically from git tags
+  description: USE WHEN a git tag or release is the trigger - generates CHANGELOG.md in Keep a Changelog form, a migration guide when there are breaking changes, and the release announcement, all derived from git history. DO NOT USE WHEN the piece is a feature blog post not tied to a tag (marketing-writer).
   model_role: [writing, fast]
 ---
 

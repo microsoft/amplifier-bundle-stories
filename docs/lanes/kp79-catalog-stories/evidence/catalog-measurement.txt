@@ -1,0 +1,50 @@
+DELEGATE AGENT CATALOG -- rendered from a scratch session, no LLM call, $0.00
+  BEFORE bundle: kp79-stories-stock   (git archive of merge-base 1f2019e)
+  AFTER  bundle: kp79-stories-scratch (this worktree, lane/kp79-catalog-stories)
+  BEFORE whole delegate tool description: 80,860 B
+  AFTER  whole delegate tool description: 83,879 B
+  DELTA:  +3,019 B   <-- a COST, not a saving
+
+PER-BUNDLE SLICE OF THE RENDERED CATALOG (bytes) -- the CONTROL
+bundle                         before    after    delta
+amplifier                         410      410       +0
+amplifier-online                  126      126       +0
+amplifier-tester                  236      236       +0
+android-tester                    352      352       +0
+app-cli                           101      101       +0
+attractor                         345      345       +0
+browser-tester                    333      333       +0
+context-intelligence              733      733       +0
+converge                        1,568    1,568       +0
+core                              229      229       +0
+design-intelligence               902      902       +0
+digital-twin-universe             129      129       +0
+dot-graph                       7,044    7,044       +0
+foundation                      4,370    4,370       +0
+infographic-builder               126      126       +0
+ios-tester                        344      344       +0
+lsp                             1,531    1,531       +0
+notify                            111      111       +0
+python-dev                      1,975    1,975       +0
+reality-check                   1,760    1,760       +0
+recipes                         1,198    1,198       +0
+stories                         1,857    4,876   +3,019
+superpowers                       741      741       +0
+terminal-tester                   390      390       +0
+work-tracker                      105      105       +0
+
+Bundles with NON-ZERO delta: ['stories']   (expected exactly ['stories'])
+Bundles with delta EXACTLY 0: 24 of 25
+
+DIFF HUNKS between the two rendered catalogs: 1  (expected 1)
+  replace before[998:1010] -> after[998:1010]   (12 -> 12 lines)
+
+Cross-check: an independent stash-based BEFORE render of the SAME worktree
+  measured 80,860 B -- byte-identical to the kp79-stories-stock render above.
+
+ARTIFACTS: catalog-slice-before.txt / catalog-slice-after.txt are the 12 `stories:`
+rows exactly as rendered. Their file sizes ARE the measurement -- 1,857 B and 4,876 B.
+The two full 80 KB catalog renders are not committed (they would add ~160 KB to the PR);
+reproduce either at $0 with:
+    KP79_BUNDLE=kp79-stories-stock   ./render-catalog.sh before.txt
+    KP79_BUNDLE=kp79-stories-scratch ./render-catalog.sh after.txt

@@ -1,7 +1,7 @@
 ---
 meta:
   name: content-strategist
-  description: Story selection and planning specialist - determines what stories to tell, for which audiences, in which formats, and with what narrative arc
+  description: USE WHEN the open question is WHICH stories to tell rather than how to write one - prioritising research findings, mapping each to an audience, format and narrative arc, then assigning it to a specialist agent. Normally runs on story-researcher output. DO NOT USE WHEN the story, audience and format are already decided and the piece just needs writing.
   model_role: [creative, writing, general]
 ---
 

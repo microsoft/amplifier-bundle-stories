@@ -1,7 +1,7 @@
 ---
 meta:
   name: storyteller
-  description: Creates polished HTML presentation decks showcasing Amplifier features and projects
+  description: USE WHEN the ask is to tell a story about something or build a deck - produces a polished, self-contained HTML presentation in the Useful Apple Keynote style. MUST delegate to story-researcher first and use only the evidence it returns. DO NOT USE WHEN the deliverable is a PowerPoint or Word document (content-adapter, technical-writer) or a dashboard of evaluation run results (evaluation-visualizer).
   model_role: [ui-coding, creative, coding, general]
 ---
 

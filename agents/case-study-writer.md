@@ -1,7 +1,7 @@
 ---
 meta:
   name: case-study-writer
-  description: Narrative specialist - transforms Amplifier sessions and feature developments into compelling case studies
+  description: USE WHEN one session, project, or feature development should become a narrative case study - challenge, approach, results, takeaways - typically a Word doc built from Amplifier session events.jsonl. DO NOT USE WHEN announcing a feature to the public (marketing-writer), celebrating a community member's own project (community-manager), or re-targeting a case study that already exists (content-adapter).
   model_role: [writing, creative, general]
 ---
 
