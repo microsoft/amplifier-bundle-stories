@@ -82,7 +82,8 @@ def _live_rows() -> list[str]:
 def _expected_rows() -> list[str]:
     rows = []
     for p in sorted((REPO / "agents").glob("*.md")):
-        t = p.read_text(); end = t.index("\n---\n", 3)
+        t = p.read_text()
+        end = t.index("\n---\n", 3)
         m = yaml.safe_load(t[4:end])["meta"]
         rows.append(f"  - {NAMESPACE}:{m['name']}: {m['description']}")
     assert rows, "no agents found -- glob matched nothing"

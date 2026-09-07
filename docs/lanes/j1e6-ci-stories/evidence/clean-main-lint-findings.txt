@@ -1,0 +1,20 @@
+Clean main (ac63a4d) is RED at the gate's own pinned rule set.
+
+  $ uvx ruff@0.16.6 check --isolated --select E4,E7,E9,F --output-format concise .
+  tests/test_live_render.py:85:26: E702 Multiple statements on one line (semicolon)
+  tools/deck-style-fix.py:651:41: E702 Multiple statements on one line (semicolon)
+  tools/deck-style-fix.py:652:37: E702 Multiple statements on one line (semicolon)
+  tools/deck-style-fix.py:653:41: E702 Multiple statements on one line (semicolon)
+  tools/deck-style-fix.py:654:42: E702 Multiple statements on one line (semicolon)
+  Found 5 errors.
+
+Fixed as a separate named commit -- each semicolon split onto its own line.
+NOT fixed by narrowing the rule set or by continue-on-error.
+
+BEHAVIOUR-NEUTRALITY PROOF (ast.dump comparison, before vs after):
+  tests/test_live_render.py: AST identical = True
+  tools/deck-style-fix.py:   AST identical = True
+
+After the fix:
+  $ uvx ruff@0.16.6 check --isolated --select E4,E7,E9,F .
+  All checks passed!
