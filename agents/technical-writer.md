@@ -1,7 +1,7 @@
 ---
 meta:
   name: technical-writer
-  description: Deep technical documentation specialist - creates comprehensive technical docs, architecture guides, and developer-focused content
+  description: USE WHEN the reader is a developer or engineer and the piece needs implementation depth - technical documentation, architecture guides, API reference, code examples and file-line references. DO NOT USE WHEN the audience is executives (executive-briefer) or the public (marketing-writer), or the piece is a narrative account of one project (case-study-writer).
   model_role: [writing, creative, general]
 ---
 

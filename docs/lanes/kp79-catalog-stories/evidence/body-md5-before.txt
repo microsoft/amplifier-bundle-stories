@@ -1,0 +1,12 @@
+75ee568fca008172d586d55f9211ba66  case-study-writer.md  bodybytes=6456
+8af2851d73f8e8261c02ddc9179fcf2b  community-manager.md  bodybytes=5990
+0ffcae6db2289cb0200e629f60ac1b7e  content-adapter.md  bodybytes=5475
+174a4f9920364d230d5c2e307c87a6c4  content-strategist.md  bodybytes=6185
+6f45c48dc009b503e68555e89703cc22  data-analyst.md  bodybytes=5453
+37200cb69c94e5eef1fbebcce53a3ce0  evaluation-visualizer.md  bodybytes=18462
+f1bcc8695b2f9f4a03972fee4f5f10a1  executive-briefer.md  bodybytes=5207
+81c1992d5df5d440da4d104c1d1c60e8  marketing-writer.md  bodybytes=4392
+a2838bb5f03562c409459cb50dd0e8e8  release-manager.md  bodybytes=5684
+aad47c4eef6998437d26697b1b13a2f2  story-researcher.md  bodybytes=6259
+6b19a3da5453aa14daf03414f581b575  storyteller.md  bodybytes=19651
+3c672b3d24105667739ec443f52e913a  technical-writer.md  bodybytes=4163

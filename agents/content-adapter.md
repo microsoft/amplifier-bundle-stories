@@ -1,7 +1,7 @@
 ---
 meta:
   name: content-adapter
-  description: Multi-format transformation specialist - adapts content between formats and audiences while preserving core message
+  description: USE WHEN the content ALREADY EXISTS and only its format or audience must change, with the core message preserved - PowerPoint to Word, Excel to slides, anything to blog post or one-page PDF, technical to executive or community. DO NOT USE WHEN the piece must be written from source data for the first time - route that to the agent that owns the audience (technical-writer, marketing-writer, executive-briefer, case-study-writer).
   model_role: [writing, general]
 ---
 

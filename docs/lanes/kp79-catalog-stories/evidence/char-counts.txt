@@ -1,0 +1,16 @@
+agent                     stock   lean   delta  body
+case-study-writer           106    403    +297  IDENTICAL
+community-manager           110    396    +286  IDENTICAL
+content-adapter             115    430    +315  IDENTICAL
+content-strategist          141    353    +212  IDENTICAL
+data-analyst                 98    315    +217  IDENTICAL
+evaluation-visualizer       233    446    +213  IDENTICAL
+executive-briefer           107    319    +212  IDENTICAL
+marketing-writer            103    371    +268  IDENTICAL
+release-manager             128    293    +165  IDENTICAL
+story-researcher            130    417    +287  IDENTICAL
+storyteller                  83    403    +320  IDENTICAL
+technical-writer            130    359    +229  IDENTICAL
+REPO TOTAL                 1484   4505   +3021
+
+Budget: largest lean description = 446 chars vs the ~600 ceiling.

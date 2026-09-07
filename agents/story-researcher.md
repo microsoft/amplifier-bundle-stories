@@ -1,7 +1,7 @@
 ---
 meta:
   name: story-researcher
-  description: Automated data gathering specialist - mines git repos, sessions, bundles, and ecosystem activity to discover stories worth telling
+  description: USE WHEN claims need evidence before anything is written - mines git history, PRs, session events.jsonl, bundle configs and cross-repo activity, returning structured JSON of metrics, timelines and contributors, and reporting gaps rather than inventing numbers. REQUIRED before any storyteller deck. DO NOT USE WHEN prose or a finished deliverable is what is wanted - this agent gathers evidence and writes no content.
   model_role: [research, fast]
 ---
 

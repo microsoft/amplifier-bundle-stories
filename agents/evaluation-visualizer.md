@@ -1,7 +1,7 @@
 ---
 meta:
   name: evaluation-visualizer
-  description: Builds self-contained HTML evaluation dashboards from evaluation run results — caller provides the data location. Use for prompts like "create me an evaluation dashboard using the results at <path>" or "visualize these eval results".
+  description: USE WHEN an evaluation or benchmark run has produced results at a path and they need visualising - builds a self-contained HTML dashboard plus sibling data.json from that caller-provided data location. Typical asks are "create me an evaluation dashboard using the results at <path>" or "visualize these eval results". DO NOT USE WHEN the deliverable is a narrative showcase deck (storyteller) or a spreadsheet of ecosystem metrics (data-analyst).
   model_role: [ui-coding, creative, coding, general]
 ---
 

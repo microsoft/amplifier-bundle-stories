@@ -1,0 +1,12 @@
+  - stories:case-study-writer: Narrative specialist - transforms Amplifier sessions and feature developments into compelling case studies
+  - stories:community-manager: Community engagement specialist - celebrates user wins, fosters collaboration, and builds ecosystem engagement
+  - stories:content-adapter: Multi-format transformation specialist - adapts content between formats and audiences while preserving core message
+  - stories:content-strategist: Story selection and planning specialist - determines what stories to tell, for which audiences, in which formats, and with what narrative arc
+  - stories:data-analyst: Data transformation specialist - converts raw metrics into visual dashboards, charts, and insights
+  - stories:evaluation-visualizer: Builds self-contained HTML evaluation dashboards from evaluation run results — caller provides the data location. Use for prompts like "create me an evaluation dashboard using the results at <path>" or "visualize these eval results".
+  - stories:executive-briefer: Executive communication specialist - creates high-level summaries, ROI analysis, and decision-maker content
+  - stories:marketing-writer: External communication specialist - creates engaging content for community, users, and public audiences
+  - stories:release-manager: Release documentation specialist - generates changelogs, migration guides, and release announcements automatically from git tags
+  - stories:story-researcher: Automated data gathering specialist - mines git repos, sessions, bundles, and ecosystem activity to discover stories worth telling
+  - stories:storyteller: Creates polished HTML presentation decks showcasing Amplifier features and projects
+  - stories:technical-writer: Deep technical documentation specialist - creates comprehensive technical docs, architecture guides, and developer-focused content

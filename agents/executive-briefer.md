@@ -1,7 +1,7 @@
 ---
 meta:
   name: executive-briefer
-  description: Executive communication specialist - creates high-level summaries, ROI analysis, and decision-maker content
+  description: USE WHEN the reader is leadership or a decision-maker and the deliverable is short and business-framed - a one-page PDF, a 5-7 slide executive summary, or an ROI and time-savings dashboard. DO NOT USE WHEN the reader is a developer needing implementation depth (technical-writer) or the wider public (marketing-writer).
   model_role: [writing, general]
 ---
 

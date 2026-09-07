@@ -1,7 +1,7 @@
 ---
 meta:
   name: data-analyst
-  description: Data transformation specialist - converts raw metrics into visual dashboards, charts, and insights
+  description: USE WHEN raw metrics must become something a reader can see - Excel dashboards, trend and comparison charts, big-number slides, or CSV/JSON exports feeding other agents. DO NOT USE WHEN the deliverable is an HTML presentation deck (storyteller) or a dashboard of an evaluation run's results (evaluation-visualizer).
   model_role: [creative, coding, general]
 ---
 
