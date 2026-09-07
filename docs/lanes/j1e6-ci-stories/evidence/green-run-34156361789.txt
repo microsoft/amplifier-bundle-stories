@@ -1,0 +1,47 @@
+GREEN RUN 34156361789
+https://github.com/microsoft/amplifier-bundle-stories/actions/runs/34156361789
+
+Branch lane/j1e6-ci-stories @ 6e8e7b0a7b2ad50982796842f592b81d66dcfa55
+All four checks SUCCESS. Verbatim job-log excerpts, timestamps stripped.
+
+The 74 passing tests include tests/test_live_render.py's 4, which execute the
+REAL delegate renderer and refuse to skip -- so a green here means the pinned
+amplifier-foundation / amplifier-module-tool-delegate installs genuinely worked
+on the runner, not that four tests quietly opted out.
+
+==============================================================================
+LINT
+==============================================================================
+Downloading ruff (9.8MiB)
+ Downloaded ruff
+Installed 1 package in 2ms
+All checks passed!
+==============================================================================
+TESTS (py3.11)
+==============================================================================
+      Built amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate
+      Built amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384
+Installed 17 packages in 3ms
+........................................................................ [ 97%]
+..                                                                       [100%]
+74 passed in 0.87s
+==============================================================================
+TESTS (py3.13)
+==============================================================================
+      Built amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate
+      Built amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384
+Installed 17 packages in 9ms
+........................................................................ [ 97%]
+..                                                                       [100%]
+74 passed in 1.31s
+==============================================================================
+BUNDLE STRUCTURE (YAML)
+==============================================================================
+  Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.15/x64
+  LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.15/x64/lib
+##[endgroup]
+OK  bundle.md  (bundle.name=stories)
+OK  behaviors/stories.yaml  (bundle.name=stories-behavior)
+
+2 YAML document(s) parsed.
+Bundle structure OK.

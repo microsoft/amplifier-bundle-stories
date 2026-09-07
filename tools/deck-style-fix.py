@@ -648,10 +648,14 @@ def phase4_inject_missing(html: str) -> tuple[str, list[Change]]:
 def fix_deck(html: str) -> tuple[str, list[Change]]:
     """Run all 4 fix phases on an HTML deck string."""
     changes: list[Change] = []
-    html, c = phase1_css_variables(html);  changes.extend(c)
-    html, c = phase2_css_rules(html);      changes.extend(c)
-    html, c = phase3_inline_styles(html);  changes.extend(c)
-    html, c = phase4_inject_missing(html); changes.extend(c)
+    html, c = phase1_css_variables(html)
+    changes.extend(c)
+    html, c = phase2_css_rules(html)
+    changes.extend(c)
+    html, c = phase3_inline_styles(html)
+    changes.extend(c)
+    html, c = phase4_inject_missing(html)
+    changes.extend(c)
     return html, changes
 
 
