@@ -1,0 +1,54 @@
+// This recipe takes a feature idea, researches it, writes a blog post and social media content, and saves everything ready to publish.
+digraph blog_post_generator {
+    rankdir=TB
+    fontname="Helvetica"
+    fontsize=12
+    label="Blog Post Generator\nResearches a feature, writes a blog post & social snippets, and saves it all"
+    labelloc=t
+    labeljust=c
+    compound=true
+    nodesep=0.6
+    ranksep=0.7
+    bgcolor="white"
+    source_hash="f30f797400f97ad633fd2e710ecb82e243de9cc1e43401e28d8d92604c174355"
+
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded"]
+    edge [fontname="Helvetica", fontsize=9]
+
+    start [label="Start", shape=oval, fillcolor="#e0e0e0"]
+    done  [label="Done!", shape=oval, fillcolor="#e0e0e0"]
+
+    step_research [label="Dig Into the Feature\n\"What's the story here?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="story-researcher"]
+    step_planning [label="Plan the Post\n\"What should we cover?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="content-strategist"]
+    step_write_blog_post [label="Write the Blog Post\n\"Tell the story!\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="marketing-writer"]
+    step_write_social_media [label="Write Social Posts\n\"Spread the word!\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="marketing-writer"]
+    cond_step_write_technical_appendix [label="Include Tech\nDetails?", shape=diamond, fillcolor="#fff9c4"]
+    step_write_technical_appendix [label="Write Tech Deep-Dive\n\"For the curious readers\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="technical-writer"]
+    step_save_files [label="Save All Files\n\"Put everything in place\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  # Create slug from feature name FEATURE_NAME='{{feature_name}}' SLUG=$(echo '$FEA"]
+    step_finalize [label="Final Check\n\"Is everything there?\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="BLOG_FILE='{{file_paths.blog_file}}' SOCIAL_FILE='{{file_paths.social_file}}'  # Verify files exist "]
+
+    start -> step_research
+    step_research -> step_planning
+    step_planning -> step_write_blog_post
+    step_write_blog_post -> step_write_social_media
+    step_write_social_media -> cond_step_write_technical_appendix
+    cond_step_write_technical_appendix -> step_write_technical_appendix [label="yes"]
+    step_write_social_media -> step_save_files
+    step_save_files -> step_finalize
+    cond_step_write_technical_appendix -> step_save_files [label="skip", style=dashed]
+    step_finalize -> done
+
+    subgraph cluster_legend {
+        label="Legend\n\"What do the shapes mean?\""
+        style="filled,rounded"
+        fillcolor="white"
+        color="#cccccc"
+        fontsize=10
+        node [shape=box, fontsize=9, width=1.6]
+        leg_bash [label="Script Step", shape=box, fillcolor="#bbdefb"]
+        leg_agent [label="AI Agent Step", shape=box, fillcolor="#c8e6c9"]
+        leg_cond [label="Condition", shape=diamond, fillcolor="#fff9c4"]
+        leg_start [label="Start / End", shape=oval, fillcolor="#e0e0e0"]
+        leg_bash -> leg_agent -> leg_cond -> leg_start [style=invis]
+    }
+}
