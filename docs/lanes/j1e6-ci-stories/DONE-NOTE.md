@@ -49,12 +49,24 @@ an erratum on the item, and proceeded. This lane follows that precedent:
 `work_reopen` was deliberately **not** used: the underlying work is not wrong, and a
 reopen would clear `closed_at` and move every throughput roll-up by one item.
 
-**Goal defect, restated for the next multi-lane item** (already filed by the sibling; a
-second independent lane hitting it is itself evidence): the per-lane goal template applies
-a single-lane claim/resolve procedure to a deliberately multi-lane item. Either file one
-item per repo, or have the template say: *claim if free; if a sibling holds it, proceed,
-record per-repo completion as an erratum, and let the holder or the manager close it once
-every lane has landed.*
+**Goal defect, restated for the next multi-lane item — SIX OF SIX lanes hit it.** The
+per-lane goal template applies a single-lane claim/resolve procedure to a deliberately
+multi-lane item. By the time this lane filed, five others had reported it independently:
+browser-tester (18:22Z), notify (19:34Z), tool-filesystem (19:36Z), ios-tester (19:36Z),
+amplifier-tester (19:40Z). This lane is the sixth, and **every lane that attempted the
+claim hit the same refusal**. Fix: either file one item per repo, or have the template
+say *claim if free; if a sibling holds it, proceed, record per-repo completion as an
+erratum, and let the holder or the manager close it once every lane has landed.*
+
+**And a second, procedural defect that this lane also walked into.** My first erratum
+called mine the "second independent lane", because I read the item with
+`work_list(item_id=...)` at the **start** of the lane — when browser-tester's was the only
+erratum — planned against that list, and did not re-read ~50 minutes later before writing.
+Corrected in a follow-up erratum. Four separate lanes have now made that exact slip, which
+makes it a gap in the template rather than four careless sessions: **on a busy multi-lane
+item, re-read the errata immediately before filing one.** The list you planned against is
+stale by the time you file, and the count is the whole finding — "second lane" reads as a
+coincidence, "six of six" reads as a systematic defect.
 
 ## 3. Deliverables
 
@@ -269,5 +281,7 @@ was **not** run (batch-global; the manager's verb).
 2. **After merging, confirm `main` HEAD reports a successful check-run** —
    `gh api repos/microsoft/amplifier-bundle-stories/commits/main/check-runs`. Configured
    is not installed.
-3. **The multi-lane claim defect** (§2) now has two independent lanes reporting it. Worth
-   fixing in the goal template before the next one-item/many-lanes batch.
+3. **The multi-lane claim defect** (§2) now has **six of six** lanes reporting it, plus a
+   companion procedural defect (four lanes have miscounted the prior art by not re-reading
+   the errata before filing). Both belong in the goal template before the next
+   one-item/many-lanes batch.
