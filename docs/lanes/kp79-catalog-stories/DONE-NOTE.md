@@ -20,9 +20,32 @@ The sweep's premise was that bundles ship bloated descriptions stuffed with `<ex
 
 So there was nothing to strip. What there was, was **twelve near-interchangeable routing rows**: 11 of 12 shared the literal shape `"<Role> specialist - creates <content>"`, and **0 of 12** carried any `DO NOT USE WHEN`. Meeting the standard on this repo can only add bytes. **Byte reduction was the sweep's evidence, not its purpose** — the deliverable is a routing table a model can actually route on.
 
-**Verdict: branch A, with ONE deliverable clause recorded NOT-POSSIBLE.** The cap never bound (every
-deliverable here is $0, so there is no unspendable residue to state). Nine of ten deliverables are DONE;
-the readiness half of one is structurally unfirable and is dispositioned below rather than glossed.
+**Verdict: branch A. One branch, unambiguously — see "TERMINAL STATE" below for why B and C do not apply.**
+All ten deliverables are satisfied: nine actively DONE, and the tenth **vacuously satisfied** because its
+condition cannot fire. The cap never bound (every deliverable here is $0; there is no unspendable residue).
+The unfirable clause is reported as a **GOAL DEFECT with a shipped patch** — not as an unmet deliverable.
+
+## TERMINAL STATE — one branch, and why not the other two
+
+The OUTCOME header requires **EXACTLY ONE** of three. This lane is **A**, and the other two are excluded by
+their own text, not by preference:
+
+| branch | its own condition | applies? |
+|---|---|---|
+| **A. RESOLVED** | *"kp79 is resolved with a user-readable summary AND the deliverables below exist (as a draft PR on the module's origin)"* | **YES.** Conjunct 1: kp79 `status=resolved`, full owner-facing resolution. Conjunct 2: PR #14, `isDraft: true`, `merged: false`, 20 files on `microsoft/amplifier-bundle-stories`. Both verified by live remote read. Branch A never mentions CI. |
+| B. RESOLVED AT THE CAP | *"The **spend authority** could not fund the remaining work… satisfied BY CONSTRUCTION when a deliverable resolves NOT-POSSIBLE **because of the cap**"* | **NO.** B is cap-caused by construction. The cap is $0.00, it never bound, every deliverable was fully executed at $0.00, and there is no residue. Invoking B would misattribute a goal-text defect to a budget that was never the constraint. |
+| C. BLOCKED | *"The outcome is **unreachable** for a reason other than the cap"* | **NO.** The outcome was reached, measured and published. C is falsifiable here, and false. |
+
+**On deliverable 10 specifically:** GOAL.md:72's *"marked ready **when** its own CI is green"* is a
+**conditional**. Its antecedent is permanently false on this repo, so it imposes **no obligation** — it is
+vacuously satisfied, not an unmet deliverable. That is why it does not pull this lane toward B or C. What it
+*does* establish is that the clause is unfirable by construction, which is a **defect in the goal**, reported
+below with a one-clause patch shipped as an artifact — exactly what the goal instructs for a defect
+(*"Report it against the goal, ship the patch as an artifact, and resolve"*).
+
+**Recorded for the batch:** a structurally-unsatisfiable deliverable that is neither cap-caused nor
+outcome-blocking has **no home** among the three branches. Four lanes have now hit a version of this. That is
+the fourth independent confirmation that the branches are not exhaustive in the way the header claims.
 
 ## DELIVERABLE DISPOSITION — DONE / NOT-POSSIBLE-with-reason
 
@@ -39,9 +62,9 @@ Each deliverable resolves independently, per the DELIVERABLES header.
 | 7 | Bodies byte-identical | **DONE** — 12/12 by md5 of everything after the second `---`. |
 | 8 | DONE-NOTE at the lane artifact root | **DONE** — this file, `docs/lanes/kp79-catalog-stories/DONE-NOTE.md`. |
 | 9 | DRAFT PR, not merged | **DONE** — PR #14, `isDraft: true`, `merged: false`. |
-| **10** | **…"marked ready when its own CI is green"** (GOAL.md:72, second clause) | **NOT-POSSIBLE — see reason below.** |
+| **10** | **…"marked ready when its own CI is green"** (GOAL.md:72, second clause) | **VACUOUSLY SATISFIED** — conditional with a permanently false antecedent; imposes no obligation. The unfirable clause is reported as a GOAL DEFECT, not as an unmet deliverable. Detail below. |
 
-### Deliverable 10 — NOT-POSSIBLE, and what WAS executed first
+### Deliverable 10 — why its condition cannot fire, and what WAS executed
 
 **EXECUTED:** the PR was created (`gh pr create --draft`), 20 files published, 12 descriptions rewritten and
 verified from the remote, the catalog A/B rendered with its control, `validate-agents` run on both the
@@ -58,11 +81,13 @@ actions/workflows                → total_count: 0
 actions/runs (ever, any branch)  → total_count: 0
 ```
 
-Zero workflow runs in the repository's entire history. The antecedent is **permanently false**, so the
-condition can never be satisfied — not by more work, not by more spend. **This is NOT a cap-bound
-NOT-POSSIBLE** (the cap is $0 and never bound); it is structural, and it is a **defect in the goal text**,
-reported per the goal's own instruction rather than absorbed. The one-clause patch that would close it is
-shipped as an artifact at `lanes/kp79-catalog-stories/GOAL-TEMPLATE-PATCH.md`.
+Zero workflow runs in the repository's entire history. The antecedent is **permanently false**. A conditional
+whose antecedent is false imposes no obligation, so the clause is **vacuously satisfied** and this lane's
+terminal state stays cleanly at branch A. **It is emphatically NOT a cap-bound NOT-POSSIBLE** — the cap is
+$0.00 and never bound — so branch B does not apply; and the outcome was reached, so branch C does not either.
+What remains is a **defect in the goal text**, reported per the goal's own instruction rather than absorbed.
+The one-clause patch that closes it is shipped as an artifact at
+`lanes/kp79-catalog-stories/GOAL-TEMPLATE-PATCH.md`.
 
 **WHAT THE PR STATE IS, AND WHY:** DRAFT. Branch A requires *"(as a draft PR on the module's origin)"* and
 `GOAL.md` names *"draft"* as the terminal artifact state four times against one conditional *"marked ready"*.
