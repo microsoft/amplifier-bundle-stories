@@ -216,6 +216,28 @@ tools/deck-style-fix.py:   AST identical = True
    four sibling CI lanes and, more importantly, to match the workflow that was actually
    proven red. Bumping is a one-line follow-up that should be **re-proven**, not assumed.
 
+### 6.1 Tooling finding — `gh pr edit --body-file` failed SILENTLY, exit 0
+
+Worth carrying to every sibling lane, because it is this batch's characteristic failure
+mode wearing a new hat:
+
+```
+$ gh pr edit 16 --body-file /tmp/pr-body-j1e6.md
+GraphQL: Projects (classic) is being deprecated ... (repository.pullRequest.projectCards)
+$ echo $?
+0
+```
+
+Exit **0**, no "error" wording — and the body was **not updated**. A read-back
+(`gh pr view 16 --json body`) still showed the pre-edit text, including the literal
+`GREEN_RUN_URL_PLACEHOLDER` and the wrong 60/10/4 test split. Had this lane trusted the
+exit code, the shipped PR would have quoted a placeholder where the goal requires the
+GREEN run URL — the single most checkable deliverable in the item.
+
+**Remedy that works:** `gh api repos/<owner>/<repo>/pulls/<n> -X PATCH -F body=@<file>`,
+which does not touch the deprecated `projectCards` GraphQL path. Then read the body back
+from the remote and grep it. The corrected body was verified that way.
+
 ## 7. Spend ledger
 
 | Item | Cost |
