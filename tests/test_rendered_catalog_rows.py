@@ -98,3 +98,62 @@ def test_whole_rendered_slice_is_accounted_for() -> None:
     assert slice_bytes > 0
     # Documented, not asserted as an exact value: this slice is what the bundle
     # costs in the head of every request. Recorded at 4,876 B on this branch.
+
+
+# ---------------------------------------------------------------------------
+# Anchor on REAL rendered output, not on the format string mirrored above.
+#
+# The assertions above reconstruct the row from a format string copied out of
+# tool-delegate. That proves SCHEMA COMPLIANCE, not that the live pipeline emits
+# these rows -- if the renderer changed, they would still pass.
+#
+# evidence/catalog-slice-after.txt is genuine output of the real pipeline
+# (`amplifier tool info delegate -b <alias> --format json`, tool mount and all).
+# Anchoring on it means the expected rows come from the renderer itself rather
+# than from a transcription, and any description edited without re-rendering
+# fails here.
+#
+# HONEST LIMIT, stated rather than skipped past: this repo's test environment
+# cannot import amplifier_module_tool_delegate (its native deps are absent), so
+# the renderer cannot be executed IN-PROCESS at test time. The capture below is
+# the closest deterministic anchor. To re-execute the real pipeline:
+#     docs/lanes/kp79-catalog-stories/evidence/render-catalog.sh <out>
+# ---------------------------------------------------------------------------
+
+CAPTURE = REPO / "docs/lanes/kp79-catalog-stories/evidence/catalog-slice-after.txt"
+
+
+def _captured_rows() -> dict[str, str]:
+    assert CAPTURE.exists(), f"real-render capture missing at {CAPTURE}"
+    rows: dict[str, str] = {}
+    for line in CAPTURE.read_text().splitlines():
+        if not line.startswith(f"  - {NAMESPACE}:"):
+            continue
+        name = line[len(f"  - {NAMESPACE}:") :].split(":", 1)[0]
+        rows[name] = line
+    assert rows, f"{CAPTURE.name} contained no {NAMESPACE}: rows -- capture is empty or malformed"
+    return rows
+
+
+def test_every_agent_appears_in_the_real_render_capture() -> None:
+    captured = _captured_rows()
+    live = {_frontmatter(p)["meta"]["name"] for p in _agent_files()}
+    assert live == set(captured), (
+        "the set of agents differs from the real-render capture.\n"
+        f"  only in repo:    {sorted(live - set(captured))}\n"
+        f"  only in capture: {sorted(set(captured) - live)}\n"
+        "Re-run evidence/render-catalog.sh and refresh the capture."
+    )
+
+
+@pytest.mark.parametrize("path", _agent_files(), ids=lambda p: p.stem)
+def test_rendered_row_matches_the_real_render_byte_for_byte(path: pathlib.Path) -> None:
+    row, _ = _rendered_row(path)
+    name = _frontmatter(path)["meta"]["name"]
+    captured = _captured_rows()[name]
+    assert row == captured, (
+        f"{path.name}: the row this repo would render no longer matches the real pipeline capture.\n"
+        f"  repo:    {row[:160]}\n"
+        f"  capture: {captured[:160]}\n"
+        "Either the description changed without re-rendering, or the renderer's format changed."
+    )

@@ -222,11 +222,24 @@ Procedure 4 cannot be, live — the merge is the manager's stage.
 
    **The identical file, run on both trees:**
 
+   **It anchors on REAL rendered output, not on a mirrored format string.** The schema assertions alone would
+   prove only compliance — if the renderer changed they would still pass. So the suite additionally asserts each
+   row **byte-for-byte against `evidence/catalog-slice-after.txt`**, which is genuine output of the real
+   pipeline (`amplifier tool info delegate … --format json`, real tool mount). The expected rows therefore come
+   from the renderer itself, and a description edited without re-rendering fails here.
+
    ```
-   merge-base 1f2019e :  24 failed, 25 passed     (12 trigger-first + 12 boundary)
-   this branch        :  49 passed
-   full suite here    :  57 passed
+   merge-base 1f2019e :  36 failed, 26 passed   (12 trigger-first + 12 boundary + 12 vs-real-render)
+   this branch        :  62 passed
+   full suite here    :  70 passed
    ```
+
+   **HONEST LIMIT, stated rather than skipped past:** this repo's test environment cannot import
+   `amplifier_module_tool_delegate` (its native deps are absent there), so the renderer cannot be executed
+   **in-process at test time**. The capture anchor is the closest deterministic substitute. The real pipeline
+   *was* executed — four times, for the A/B pairs — and is re-runnable at $0 via
+   `evidence/render-catalog.sh`. What is proven in-repo is: *what this repo would render is byte-identical to
+   what the real pipeline did render.* What is not proven in-repo is a fresh live render on every test run.
 
    That is the fail-before/pass-after the LANDING STAGE clause asks for, on the rendering property itself.
    It also *keeps* the property: any future agent whose rendered row regresses turns the suite red.
