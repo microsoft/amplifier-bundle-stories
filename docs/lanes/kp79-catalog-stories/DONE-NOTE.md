@@ -213,9 +213,26 @@ Procedure 4 cannot be, live — the merge is the manager's stage.
 3. **The AFTER rows render through the same pipeline**, from a bundle alias pointing at this branch:
    `stories:data-analyst: USE WHEN raw metrics must become something a reader can see …`
    `stories:storyteller: USE WHEN the ask is to tell a story about something or build a deck …`
-4. **Fail-before / pass-after is exercised on the axis the standard governs:** `validate-agents` on the
-   merge-base reports 0/12 with a strong trigger and 0/12 with a `DO NOT USE WHEN`; on the branch, **12/12 and
-   12/12**. Same tool, both sides.
+4. **Fail-before / pass-after, as an EXECUTABLE TEST OF THE RENDERED ROW — not just a measurement.**
+   `tests/test_rendered_catalog_rows.py` asserts against the exact string tool-delegate emits
+   (`  - stories:{name}: {description}`), mirroring its formatter, rather than against the source file —
+   because the rendered row is what is actually paid for. Four properties per agent (trigger-first, explicit
+   `DO NOT USE WHEN`, within budget, no tutorial markup) plus a set-level test that walks `agents/` **as a set**
+   with an **empty-glob tripwire**, so an agent added later is caught; per-file tests cannot do that.
+
+   **The identical file, run on both trees:**
+
+   ```
+   merge-base 1f2019e :  24 failed, 25 passed     (12 trigger-first + 12 boundary)
+   this branch        :  49 passed
+   full suite here    :  57 passed
+   ```
+
+   That is the fail-before/pass-after the LANDING STAGE clause asks for, on the rendering property itself.
+   It also *keeps* the property: any future agent whose rendered row regresses turns the suite red.
+
+5. **`validate-agents` corroborates on the same axis:** strong trigger 0/12 → **12/12**, `DO NOT USE WHEN`
+   0/12 → **12/12**. Same tool, both sides.
 
 **What was NOT done, and deliberately so:** no production/post-merge token-cost measurement, and no API
 spend. The authority is **$0.00** and states *"No API measurement is authorised."* A post-merge live
