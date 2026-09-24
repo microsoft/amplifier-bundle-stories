@@ -23,7 +23,7 @@ dependencies:
 
 name: "weekly-digest"
 description: "Generate comprehensive weekly digests of Amplifier ecosystem activity including commits, PRs, releases, community highlights, and key metrics"
-version: "1.1.0"
+version: "1.2.0"
 author: "Amplifier Recipes Collection"
 tags: ["community", "digest", "publishing", "automation", "marketing"]
 
@@ -31,6 +31,8 @@ tags: ["community", "digest", "publishing", "automation", "marketing"]
 # ==============================
 #
 # CHANGELOG:
+# v1.2.0 - Route generated content, paths, and date-range input through `env:`
+#          instead of interpolating them into bash source.
 # v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
 #          from ANY session bundle, not only one that already carries its
 #          agents.
@@ -323,22 +325,28 @@ steps:
   # ==========================================================================
   - id: "save-digest"
     type: "bash"
+    env:
+      DIGEST_CONTENT: "{{digest_content}}"
     command: |
       set -euo pipefail
       
       # Create directories
-      mkdir -p workspace/blog
+      mkdir -p -- workspace/blog
       
       # Generate filename with current date
       DIGEST_FILE="workspace/blog/weekly-digest-$(date +%Y-%m-%d).md"
       
       # Save the digest content
-      cat > "$DIGEST_FILE" << 'DIGEST_EOF'
-      {{digest_content}}
-      DIGEST_EOF
+      printf '%s\n' "$DIGEST_CONTENT" > "$DIGEST_FILE"
       
       # Output the file path as JSON
-      echo "{\"digest_file\": \"$DIGEST_FILE\"}"
+      export DIGEST_FILE
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import json
+      import os
+
+      print(json.dumps({"digest_file": os.environ["DIGEST_FILE"]}))
+      PY
     output: "digest_file_info"
     parse_json: true
     timeout: 60
@@ -348,15 +356,16 @@ steps:
   # ==========================================================================
   - id: "distribution"
     type: "bash"
+    env:
+      DIGEST_FILE: "{{digest_file_info.digest_file}}"
+      DATE_RANGE: "{{date_range}}"
     command: |
       set -euo pipefail
       
-      DIGEST_FILE="{{digest_file_info.digest_file}}"
-      
       # Create blog directory in docs if it exists
       if [ -d "docs" ]; then
-        mkdir -p docs/blog
-        cp "$DIGEST_FILE" "docs/blog/"
+        mkdir -p -- docs/blog
+        cp -- "$DIGEST_FILE" "docs/blog/"
         echo "✓ Copied to docs/blog/ for GitHub Pages"
       fi
       
@@ -389,10 +398,15 @@ steps:
       echo "   4. Post social media snippets from the file"
       echo "   5. Send email version via your newsletter platform"
       echo ""
-      echo "Date range: {{date_range}}"
+      printf 'Date range: %s\n' "$DATE_RANGE"
       echo "Generated: $(date -u +"%Y-%m-%d %H:%M UTC")"
       
-      echo "{\"success\": true, \"file\": \"$DIGEST_FILE\"}"
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import json
+      import os
+
+      print(json.dumps({"success": True, "file": os.environ["DIGEST_FILE"]}))
+      PY
     output: "distribution_result"
     parse_json: true
     timeout: 60

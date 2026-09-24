@@ -236,4 +236,39 @@ Key components:
 - `condition`: Optional step execution logic
 - `output`: Variable capture for next steps
 
+### Safe data in bash steps
+
+Treat repository paths, refs, session data, and generated content as untrusted.
+Never place a `{{context_value}}` directly in `command:`: recipe substitution
+happens before bash parses the command, so shell quoting or a quoted heredoc in
+the template does not make arbitrary substituted bytes safe.
+
+Use the runner's `env:` boundary instead:
+
+```yaml
+- id: save-content
+  type: bash
+  env:
+    OUTPUT_PATH: "{{output_path}}"
+    CONTENT: "{{generated_content}}"
+  command: |
+    set -euo pipefail
+    mkdir -p -- "$(dirname -- "$OUTPUT_PATH")"
+    printf '%s\n' "$CONTENT" > "$OUTPUT_PATH"
+```
+
+The runner resolves each `env:` value and passes it directly to the process
+environment; it is not parsed as shell source. Inside the command:
+
+- quote every expansion (`"$OUTPUT_PATH"`, not `$OUTPUT_PATH`);
+- use `--` before path arguments where the command supports it;
+- never use `eval`, `sh -c`, or `bash -c` with an environment value;
+- produce JSON with `jq` or static Python via `"$AMPLIFIER_PYTHON"`, not string
+  concatenation in `echo`;
+- for content too large for the platform's process environment, write it in an
+  earlier step and pass only the file path through `env:`.
+
+`tests/test_recipe_shell_inputs.py` enforces this boundary for every shipped
+bash step.
+
 See the Amplifier recipes documentation for full specification.

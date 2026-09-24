@@ -28,7 +28,7 @@ dependencies:
 
 name: "blog-post-generator"
 description: "Generate engaging blog posts about Amplifier features, capabilities, or developments for community and public audiences"
-version: "1.1.0"
+version: "1.2.0"
 author: "Amplifier Recipes Collection"
 tags: ["blog", "marketing", "content", "feature-announcement", "community"]
 
@@ -36,6 +36,10 @@ tags: ["blog", "marketing", "content", "feature-announcement", "community"]
 # ==========================
 #
 # CHANGELOG:
+# v1.2.0 - Pass all values used by bash steps through the runner's `env:`
+#          boundary and consume them only through quoted shell expansions or
+#          static Python. This prevents repository paths and generated content
+#          from being parsed as shell source.
 # v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
 #          from ANY session bundle, not only one that already carries its
 #          agents. No agent reference was changed.
@@ -102,6 +106,11 @@ context:
   
   # Optional: Output directory for generated files
   output_dir: "./workspace/blog/posts"
+
+  # Populated by the optional technical appendix step. Keeping a defined empty
+  # value lets later bash steps receive it safely through `env:` even when that
+  # step is skipped.
+  technical_appendix_path: ""
 
 steps:
   # ==========================================================================
@@ -700,33 +709,33 @@ steps:
   # ==========================================================================
   - id: "save-files"
     type: "bash"
+    env:
+      FEATURE_NAME: "{{feature_name}}"
+      OUTPUT_DIR: "{{output_dir}}"
+      BLOG_POST: "{{blog_post}}"
+      SOCIAL_MEDIA: "{{social_media}}"
+      TECHNICAL_APPENDIX_PATH: "{{technical_appendix_path}}"
     command: |
       set -euo pipefail
       
       # Create slug from feature name
-      FEATURE_NAME="{{feature_name}}"
-      SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+      SLUG=$(printf '%s' "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
       
       # Create output directories
-      OUTPUT_DIR="{{output_dir}}"
-      mkdir -p "$OUTPUT_DIR"
-      mkdir -p "${OUTPUT_DIR}/../social"
+      mkdir -p -- "$OUTPUT_DIR"
+      mkdir -p -- "${OUTPUT_DIR}/../social"
       
       # Save blog post
       BLOG_FILE="${OUTPUT_DIR}/${SLUG}.md"
-      cat > "$BLOG_FILE" << 'BLOG_EOF'
-      {{blog_post}}
-      BLOG_EOF
+      printf '%s\n' "$BLOG_POST" > "$BLOG_FILE"
       
       # Save social media content
       SOCIAL_FILE="${OUTPUT_DIR}/../social/${SLUG}-social.md"
-      cat > "$SOCIAL_FILE" << 'SOCIAL_EOF'
-      {{social_media}}
-      SOCIAL_EOF
+      printf '%s\n' "$SOCIAL_MEDIA" > "$SOCIAL_FILE"
       
       # Copy blog post to docs/blog/posts/ if that directory exists
       if [ -d "docs/blog/posts" ]; then
-        cp "$BLOG_FILE" "docs/blog/posts/${SLUG}.md"
+        cp -- "$BLOG_FILE" "docs/blog/posts/${SLUG}.md"
         echo "✅ Copied blog post to: docs/blog/posts/${SLUG}.md"
       fi
       
@@ -737,12 +746,22 @@ steps:
       echo " Files created:"
       echo "   - Blog post: $BLOG_FILE"
       echo "   - Social media: $SOCIAL_FILE"
-      {% if include_technical_appendix %}echo "   - Technical appendix: {{technical_appendix_path}}"
+      {% if include_technical_appendix %}printf '   - Technical appendix: %s\n' "$TECHNICAL_APPENDIX_PATH"
       {% endif %}
       echo ""
       
       # Output file paths for next step
-      echo "{\"blog_file\": \"$BLOG_FILE\", \"social_file\": \"$SOCIAL_FILE\", \"slug\": \"$SLUG\"}"
+      export BLOG_FILE SOCIAL_FILE SLUG
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import json
+      import os
+
+      print(json.dumps({
+          "blog_file": os.environ["BLOG_FILE"],
+          "social_file": os.environ["SOCIAL_FILE"],
+          "slug": os.environ["SLUG"],
+      }))
+      PY
     output: "file_paths"
     parse_json: true
     timeout: 60
@@ -752,10 +771,13 @@ steps:
   # ==========================================================================
   - id: "finalize"
     type: "bash"
+    env:
+      BLOG_FILE: "{{file_paths.blog_file}}"
+      SOCIAL_FILE: "{{file_paths.social_file}}"
+      TECHNICAL_APPENDIX_PATH: "{{technical_appendix_path}}"
     command: |
-      BLOG_FILE="{{file_paths.blog_file}}"
-      SOCIAL_FILE="{{file_paths.social_file}}"
-      
+      set -euo pipefail
+
       # Verify files exist
       if [ ! -f "$BLOG_FILE" ]; then
         echo "❌ ERROR: Blog post not found at: $BLOG_FILE"
@@ -777,7 +799,7 @@ steps:
       echo " SOCIAL MEDIA CONTENT - Ready to Copy & Post"
       echo "═══════════════════════════════════════════════════════════════"
       echo ""
-      cat "$SOCIAL_FILE"
+      cat -- "$SOCIAL_FILE"
       echo ""
       echo "═══════════════════════════════════════════════════════════════"
       echo ""
@@ -791,7 +813,7 @@ steps:
       echo " Files:"
       echo "   - Blog: $BLOG_FILE"
       echo "   - Social: $SOCIAL_FILE"
-      {% if include_technical_appendix %}echo "   - Technical: {{technical_appendix_path}}"
+      {% if include_technical_appendix %}printf '   - Technical: %s\n' "$TECHNICAL_APPENDIX_PATH"
       {% endif %}
       echo ""
     output: "completion_message"

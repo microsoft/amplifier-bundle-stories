@@ -19,7 +19,7 @@ dependencies:
 
 name: "git-tag-to-changelog"
 description: "Generate complete release documentation from git tags including changelog, release notes, and migration guides"
-version: "1.1.0"
+version: "1.2.0"
 author: "Amplifier Recipes Collection"
 tags: ["release", "changelog", "documentation", "git", "automation"]
 
@@ -27,6 +27,9 @@ tags: ["release", "changelog", "documentation", "git", "automation"]
 # ===========================
 #
 # CHANGELOG:
+# v1.2.0 - Route repository paths, refs, generated content, and metadata through
+#          the runner's `env:` boundary. Bash commands contain no direct
+#          context interpolation, preventing shell command injection.
 # v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
 #          from ANY session bundle, not only one that already carries its
 #          agents. All three referenced agents (zen-architect, explorer,
@@ -103,18 +106,30 @@ context:
   # Optional: Skip PR creation (just generate files)
   skip_pr: false
 
+  # Defaults for optional agent outputs. These are overwritten when their
+  # generating steps run, and remain safe empty values when those steps skip.
+  migration_guide: ""
+  blog_post: ""
+  social_media:
+    twitter: ""
+    linkedin: ""
+    mastodon: ""
+
 steps:
   # ==========================================================================
   # Step 1: Detect and validate git tag
   # ==========================================================================
   - id: "detect-tag"
     type: "bash"
+    env:
+      REPO_PATH: "{{repo_path}}"
+      TAG_NAME: "{{tag_name}}"
     command: |
       set -euo pipefail
       
-      cd "{{repo_path}}"
+      cd -- "$REPO_PATH"
       
-      tag_name="{{tag_name}}"
+      tag_name=$TAG_NAME
       
       # Validate tag_name was provided
       if [ -z "$tag_name" ]; then
@@ -122,17 +137,25 @@ steps:
         exit 1
       fi
       
-      # Verify tag exists
-      if ! git tag -l "$tag_name" | grep -q "^$tag_name$"; then
-        echo "{\"error\": \"Tag $tag_name does not exist\", \"success\": false}"
+      # Validate the ref syntax and verify the exact tag exists. Use the full
+      # refs/tags/ path so a tag beginning with '-' can never become an option.
+      if ! git check-ref-format "refs/tags/$tag_name" >/dev/null 2>&1; then
+        jq -n --arg error "Invalid tag name: $tag_name" \
+          '{error: $error, success: false}'
+        exit 1
+      fi
+      tag_ref="refs/tags/$tag_name"
+      if ! git rev-parse --verify --quiet "${tag_ref}^{commit}" >/dev/null; then
+        jq -n --arg error "Tag $tag_name does not exist" \
+          '{error: $error, success: false}'
         exit 1
       fi
       
       # Get tag commit SHA
-      tag_sha=$(git rev-list -n 1 "$tag_name")
+      tag_sha=$(git rev-list -n 1 "$tag_ref")
       
       # Find previous tag (most recent tag before this one)
-      previous_tag=$(git describe --abbrev=0 --tags "${tag_name}^" 2>/dev/null || echo "")
+      previous_tag=$(git describe --abbrev=0 --tags "${tag_ref}^" 2>/dev/null || echo "")
       
       if [ -z "$previous_tag" ]; then
         # No previous tag, use first commit
@@ -177,19 +200,29 @@ steps:
       repo_url=$(git remote get-url origin 2>/dev/null || echo "")
       repo_url=$(echo "$repo_url" | sed 's/\.git$//' | sed 's|git@github.com:|https://github.com/|')
       
-      echo "{
-        \"success\": true,
-        \"tag_name\": \"$tag_name\",
-        \"tag_sha\": \"$tag_sha\",
-        \"previous_tag\": \"$previous_tag\",
-        \"previous_sha\": \"$previous_sha\",
-        \"current_version\": \"$current_version\",
-        \"previous_version\": \"$previous_version\",
-        \"release_type\": \"$release_type\",
-        \"commit_range\": \"$commit_range\",
-        \"repo_url\": \"$repo_url\",
-        \"error\": null
-      }"
+      jq -n \
+        --arg tag_name "$tag_name" \
+        --arg tag_sha "$tag_sha" \
+        --arg previous_tag "$previous_tag" \
+        --arg previous_sha "$previous_sha" \
+        --arg current_version "$current_version" \
+        --arg previous_version "$previous_version" \
+        --arg release_type "$release_type" \
+        --arg commit_range "$commit_range" \
+        --arg repo_url "$repo_url" \
+        '{
+          success: true,
+          tag_name: $tag_name,
+          tag_sha: $tag_sha,
+          previous_tag: $previous_tag,
+          previous_sha: $previous_sha,
+          current_version: $current_version,
+          previous_version: $previous_version,
+          release_type: $release_type,
+          commit_range: $commit_range,
+          repo_url: $repo_url,
+          error: null
+        }'
     output: "tag_info"
     parse_json: true
     timeout: 60
@@ -200,13 +233,16 @@ steps:
   # ==========================================================================
   - id: "extract-commits"
     type: "bash"
+    env:
+      REPO_PATH: "{{repo_path}}"
+      COMMIT_RANGE: "{{tag_info.commit_range}}"
     command: |
       set -euo pipefail
       
-      cd "{{repo_path}}"
+      cd -- "$REPO_PATH"
       
       # Get commits with full details
-      git log {{tag_info.commit_range}} \
+      git log "$COMMIT_RANGE" \
         --pretty=format:'{"sha": "%H", "short_sha": "%h", "author": "%an", "email": "%ae", "date": "%aI", "subject": "%s", "body": "%b"},' \
         --no-merges > commits.json.tmp || echo "" > commits.json.tmp
       
@@ -230,7 +266,7 @@ steps:
       last_commit_date=$(jq -r '.[-1].date // ""' commits-clean.json)
       
       # Get files changed stats
-      files_changed=$(git diff --shortstat {{tag_info.commit_range}} | sed 's/^[[:space:]]*//')
+      files_changed=$(git diff --shortstat "$COMMIT_RANGE" | sed 's/^[[:space:]]*//')
       
       jq -n \
         --argjson commits "$(cat commits-clean.json)" \
@@ -826,93 +862,118 @@ steps:
   # ==========================================================================
   - id: "save-files"
     type: "bash"
+    env:
+      OUTPUT_DIR: "{{output_dir}}"
+      TAG_NAME: "{{tag_info.tag_name}}"
+      CHANGELOG_ENTRY: "{{changelog_entry}}"
+      RELEASE_NOTES: "{{release_notes}}"
+      MIGRATION_GUIDE: "{{migration_guide}}"
+      BLOG_POST: "{{blog_post}}"
+      SOCIAL_TWITTER: "{{social_media.twitter}}"
+      SOCIAL_LINKEDIN: "{{social_media.linkedin}}"
+      SOCIAL_MASTODON: "{{social_media.mastodon}}"
+      CURRENT_VERSION: "{{tag_info.current_version}}"
+      PREVIOUS_VERSION: "{{tag_info.previous_version}}"
+      RELEASE_TYPE: "{{tag_info.release_type}}"
+      COMMIT_COUNT: "{{commit_history.commit_count}}"
+      CONTRIBUTOR_COUNT: "{{commit_history.contributor_count}}"
+      BREAKING_COUNT: "{{commit_analysis.statistics.breaking_count}}"
+      HAS_BREAKING_CHANGES: "{{commit_analysis.statistics.has_breaking_changes}}"
+      INCLUDE_BLOG_POST: "{{include_blog_post}}"
+      INCLUDE_SOCIAL_MEDIA: "{{include_social_media}}"
     command: |
       set -euo pipefail
       
-      output_dir="{{output_dir}}"
-      tag_name="{{tag_info.tag_name}}"
+      output_dir=$OUTPUT_DIR
+      tag_name=$TAG_NAME
+      tag_file=$(printf '%s' "$tag_name" | sed 's/[^A-Za-z0-9._-]/-/g')
       
       # Create output directory structure
-      mkdir -p "$output_dir"
-      mkdir -p "$output_dir/social"
+      mkdir -p -- "$output_dir"
+      mkdir -p -- "$output_dir/social"
       
       # Save CHANGELOG entry
-      cat > "$output_dir/CHANGELOG-${tag_name}.md" << 'CHANGELOG_EOF'
-      {{changelog_entry}}
-      CHANGELOG_EOF
+      printf '%s\n' "$CHANGELOG_ENTRY" > "$output_dir/CHANGELOG-${tag_file}.md"
       
       # Save GitHub release notes
-      cat > "$output_dir/RELEASE-NOTES-${tag_name}.md" << 'RELEASE_EOF'
-      {{release_notes}}
-      RELEASE_EOF
+      printf '%s\n' "$RELEASE_NOTES" > "$output_dir/RELEASE-NOTES-${tag_file}.md"
       
       # Save migration guide if exists
       {% if commit_analysis.statistics.has_breaking_changes %}
-      cat > "$output_dir/MIGRATION-${tag_name}.md" << 'MIGRATION_EOF'
-      {{migration_guide}}
-      MIGRATION_EOF
+      printf '%s\n' "$MIGRATION_GUIDE" > "$output_dir/MIGRATION-${tag_file}.md"
       {% endif %}
       
       # Save blog post if generated
       {% if include_blog_post %}
-      cat > "$output_dir/BLOG-POST-${tag_name}.md" << 'BLOG_EOF'
-      {{blog_post}}
-      BLOG_EOF
+      printf '%s\n' "$BLOG_POST" > "$output_dir/BLOG-POST-${tag_file}.md"
       {% endif %}
       
       # Save social media content if generated
       {% if include_social_media %}
-      cat > "$output_dir/social/twitter.txt" << 'TWITTER_EOF'
-      {{social_media.twitter}}
-      TWITTER_EOF
-      
-      cat > "$output_dir/social/linkedin.txt" << 'LINKEDIN_EOF'
-      {{social_media.linkedin}}
-      LINKEDIN_EOF
-      
-      cat > "$output_dir/social/mastodon.txt" << 'MASTODON_EOF'
-      {{social_media.mastodon}}
-      MASTODON_EOF
+      printf '%s\n' "$SOCIAL_TWITTER" > "$output_dir/social/twitter.txt"
+      printf '%s\n' "$SOCIAL_LINKEDIN" > "$output_dir/social/linkedin.txt"
+      printf '%s\n' "$SOCIAL_MASTODON" > "$output_dir/social/mastodon.txt"
       {% endif %}
       
       # Create summary file
-      cat > "$output_dir/README.md" << 'README_EOF'
-      # Release Documentation: {{tag_name}}
-      
-      Generated on: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-      
-      ## Files Generated
-      
-      - `CHANGELOG-${tag_name}.md` - Changelog entry for CHANGELOG.md
-      - `RELEASE-NOTES-${tag_name}.md` - GitHub release notes
-      {% if commit_analysis.statistics.has_breaking_changes %}- `MIGRATION-${tag_name}.md` - Migration guide
-      {% endif %}{% if include_blog_post %}- `BLOG-POST-${tag_name}.md` - Blog post announcement
-      {% endif %}{% if include_social_media %}- `social/` - Social media content (Twitter, LinkedIn, Mastodon)
-      {% endif %}
-      
-      ## Release Information
-      
-      - **Version**: {{tag_info.current_version}}
-      - **Previous Version**: {{tag_info.previous_version}}
-      - **Release Type**: {{tag_info.release_type}}
-      - **Commits**: {{commit_history.commit_count}}
-      - **Contributors**: {{commit_history.contributor_count}}
-      - **Breaking Changes**: {{commit_analysis.statistics.breaking_count}}
-      
-      ## Next Steps
-      
-      1. Review all generated files
-      2. Update CHANGELOG.md with the entry from `CHANGELOG-${tag_name}.md`
-      3. Create GitHub release using `RELEASE-NOTES-${tag_name}.md`
-      4. Publish blog post if applicable
-      5. Share on social media using the templates in `social/`
-      README_EOF
+      export tag_file
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import datetime
+      import os
+      from pathlib import Path
+
+      output_dir = Path(os.environ["OUTPUT_DIR"])
+      tag_name = os.environ["TAG_NAME"]
+      tag_file = os.environ["tag_file"]
+      lines = [
+          f"# Release Documentation: {tag_name}",
+          "",
+          f"Generated on: {datetime.datetime.now(datetime.UTC):%Y-%m-%d %H:%M:%S UTC}",
+          "",
+          "## Files Generated",
+          "",
+          f"- `CHANGELOG-{tag_file}.md` - Changelog entry for CHANGELOG.md",
+          f"- `RELEASE-NOTES-{tag_file}.md` - GitHub release notes",
+      ]
+      if os.environ["HAS_BREAKING_CHANGES"] == "true":
+          lines.append(f"- `MIGRATION-{tag_file}.md` - Migration guide")
+      if os.environ["INCLUDE_BLOG_POST"] == "true":
+          lines.append(f"- `BLOG-POST-{tag_file}.md` - Blog post announcement")
+      if os.environ["INCLUDE_SOCIAL_MEDIA"] == "true":
+          lines.append("- `social/` - Social media content (Twitter, LinkedIn, Mastodon)")
+      lines.extend([
+          "",
+          "## Release Information",
+          "",
+          f"- **Version**: {os.environ['CURRENT_VERSION']}",
+          f"- **Previous Version**: {os.environ['PREVIOUS_VERSION']}",
+          f"- **Release Type**: {os.environ['RELEASE_TYPE']}",
+          f"- **Commits**: {os.environ['COMMIT_COUNT']}",
+          f"- **Contributors**: {os.environ['CONTRIBUTOR_COUNT']}",
+          f"- **Breaking Changes**: {os.environ['BREAKING_COUNT']}",
+          "",
+          "## Next Steps",
+          "",
+          "1. Review all generated files",
+          f"2. Update CHANGELOG.md with the entry from `CHANGELOG-{tag_file}.md`",
+          f"3. Create GitHub release using `RELEASE-NOTES-{tag_file}.md`",
+          "4. Publish blog post if applicable",
+          "5. Share on social media using the templates in `social/`",
+          "",
+      ])
+      (output_dir / "README.md").write_text("\n".join(lines), encoding="utf-8")
+      PY
       
       # List all created files
       echo "Files saved to: $output_dir"
-      ls -lh "$output_dir"
+      ls -lh -- "$output_dir"
       
-      echo "{\"output_dir\": \"$output_dir\", \"files_created\": true}"
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import json
+      import os
+
+      print(json.dumps({"output_dir": os.environ["OUTPUT_DIR"], "files_created": True}))
+      PY
     output: "files_saved"
     parse_json: true
     timeout: 60
@@ -923,17 +984,38 @@ steps:
   - id: "create-pr"
     condition: "{{skip_pr}} == false"
     type: "bash"
+    env:
+      REPO_PATH: "{{repo_path}}"
+      TAG_NAME: "{{tag_info.tag_name}}"
+      BRANCH_NAME: "{{branch_name}}"
+      OUTPUT_DIR: "{{output_dir}}"
+      CHANGELOG_ENTRY: "{{changelog_entry}}"
+      CURRENT_VERSION: "{{tag_info.current_version}}"
+      PREVIOUS_VERSION: "{{tag_info.previous_version}}"
+      RELEASE_TYPE: "{{tag_info.release_type}}"
+      COMMIT_COUNT: "{{commit_history.commit_count}}"
+      CONTRIBUTOR_COUNT: "{{commit_history.contributor_count}}"
+      BREAKING_COUNT: "{{commit_analysis.statistics.breaking_count}}"
+      HAS_BREAKING_CHANGES: "{{commit_analysis.statistics.has_breaking_changes}}"
+      INCLUDE_BLOG_POST: "{{include_blog_post}}"
+      INCLUDE_SOCIAL_MEDIA: "{{include_social_media}}"
     command: |
       set -euo pipefail
       
-      cd "{{repo_path}}"
+      cd -- "$REPO_PATH"
       
-      tag_name="{{tag_info.tag_name}}"
-      branch_name="{{branch_name}}"
+      tag_name=$TAG_NAME
+      branch_name=$BRANCH_NAME
+      tag_file=$(printf '%s' "$tag_name" | sed 's/[^A-Za-z0-9._-]/-/g')
       
       # Use default branch name if not provided
       if [ -z "$branch_name" ]; then
         branch_name="release-${tag_name}-docs"
+      fi
+
+      if ! git check-ref-format --branch "$branch_name" >/dev/null 2>&1; then
+        echo '{"error": "Invalid branch name", "pr_created": false}'
+        exit 1
       fi
       
       # Check if gh CLI is available
@@ -960,79 +1042,118 @@ steps:
         temp_file=$(mktemp)
         head -n 2 CHANGELOG.md > "$temp_file"
         echo "" >> "$temp_file"
-        cat "{{output_dir}}/CHANGELOG-${tag_name}.md" >> "$temp_file"
+        cat -- "$OUTPUT_DIR/CHANGELOG-${tag_file}.md" >> "$temp_file"
         echo "" >> "$temp_file"
         tail -n +3 CHANGELOG.md >> "$temp_file"
         mv "$temp_file" CHANGELOG.md
       else
         # Create new CHANGELOG.md
-        cat > CHANGELOG.md << 'CHANGELOG_NEW'
-      # Changelog
-      
-      All notable changes to this project will be documented in this file.
-      
-      {{changelog_entry}}
-      CHANGELOG_NEW
+        {
+          printf '%s\n\n' '# Changelog'
+          printf '%s\n\n' 'All notable changes to this project will be documented in this file.'
+          printf '%s\n' "$CHANGELOG_ENTRY"
+        } > CHANGELOG.md
       fi
       
       # Add all generated files
-      git add CHANGELOG.md
-      git add "{{output_dir}}"
+      git add -- CHANGELOG.md
+      git add -- "$OUTPUT_DIR"
       
       # Commit
-      git commit -m "docs: add release documentation for ${tag_name}
+      commit_message=$(mktemp)
+      export commit_message
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import os
+      from pathlib import Path
 
-      - Add changelog entry
-      - Add GitHub release notes
-      {% if commit_analysis.statistics.has_breaking_changes %}- Add migration guide
-      {% endif %}{% if include_blog_post %}- Add blog post announcement
-      {% endif %}{% if include_social_media %}- Add social media content
-      {% endif %}
-
-      Generated by git-tag-to-changelog recipe"
+      lines = [
+          f"docs: add release documentation for {os.environ['TAG_NAME']}",
+          "",
+          "- Add changelog entry",
+          "- Add GitHub release notes",
+      ]
+      if os.environ["HAS_BREAKING_CHANGES"] == "true":
+          lines.append("- Add migration guide")
+      if os.environ["INCLUDE_BLOG_POST"] == "true":
+          lines.append("- Add blog post announcement")
+      if os.environ["INCLUDE_SOCIAL_MEDIA"] == "true":
+          lines.append("- Add social media content")
+      lines.extend(["", "Generated by git-tag-to-changelog recipe", ""])
+      Path(os.environ["commit_message"]).write_text("\n".join(lines), encoding="utf-8")
+      PY
+      git commit -F "$commit_message"
+      rm -f -- "$commit_message"
       
       # Push branch
       git push -u origin "$branch_name"
       
       # Create PR
+      pr_body=$(mktemp)
+      export pr_body
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import os
+      from pathlib import Path
+
+      tag = os.environ["TAG_NAME"]
+      lines = [
+          f"## Release Documentation for {tag}",
+          "",
+          f"This PR adds complete release documentation for {tag}.",
+          "",
+          "### Generated Files",
+          "",
+          "- CHANGELOG.md entry",
+          "- GitHub release notes",
+      ]
+      if os.environ["HAS_BREAKING_CHANGES"] == "true":
+          lines.append("- Migration guide (breaking changes detected)")
+      if os.environ["INCLUDE_BLOG_POST"] == "true":
+          lines.append("- Blog post announcement")
+      if os.environ["INCLUDE_SOCIAL_MEDIA"] == "true":
+          lines.append("- Social media templates")
+      lines.extend([
+          "",
+          "### Release Information",
+          "",
+          f"- **Version**: {os.environ['CURRENT_VERSION']}",
+          f"- **Previous**: {os.environ['PREVIOUS_VERSION']}",
+          f"- **Type**: {os.environ['RELEASE_TYPE']}",
+          f"- **Commits**: {os.environ['COMMIT_COUNT']}",
+          f"- **Contributors**: {os.environ['CONTRIBUTOR_COUNT']}",
+          f"- **Breaking Changes**: {os.environ['BREAKING_COUNT']}",
+          "",
+          "### Next Steps",
+          "",
+          "1. Review the generated documentation",
+          "2. Make any necessary edits",
+          "3. Merge this PR",
+          "4. Create the GitHub release using the release notes",
+          "5. Publish announcements",
+          "",
+          "---",
+          "",
+          "Generated by `git-tag-to-changelog` recipe",
+          "",
+      ])
+      Path(os.environ["pr_body"]).write_text("\n".join(lines), encoding="utf-8")
+      PY
       pr_url=$(gh pr create \
-        --title " Release documentation for ${tag_name}" \
-        --body "## Release Documentation for ${tag_name}
-
-      This PR adds complete release documentation for ${tag_name}.
-
-      ### Generated Files
-
-      - ✅ CHANGELOG.md entry
-      - ✅ GitHub release notes
-      {% if commit_analysis.statistics.has_breaking_changes %}- ✅ Migration guide (breaking changes detected)
-      {% endif %}{% if include_blog_post %}- ✅ Blog post announcement
-      {% endif %}{% if include_social_media %}- ✅ Social media templates
-      {% endif %}
-
-      ### Release Information
-
-      - **Version**: {{tag_info.current_version}}
-      - **Previous**: {{tag_info.previous_version}}
-      - **Type**: {{tag_info.release_type}}
-      - **Commits**: {{commit_history.commit_count}}
-      - **Contributors**: {{commit_history.contributor_count}}
-      - **Breaking Changes**: {{commit_analysis.statistics.breaking_count}}
-
-      ### Next Steps
-
-      1. Review the generated documentation
-      2. Make any necessary edits
-      3. Merge this PR
-      4. Create the GitHub release using the release notes
-      5. Publish announcements
-
-      ---
-
-      Generated by \`git-tag-to-changelog\` recipe" \
+        --title "Release documentation for ${tag_name}" \
+        --body-file "$pr_body" \
         --head "$branch_name")
+      rm -f -- "$pr_body"
       
-      echo "{\"pr_created\": true, \"pr_url\": \"$pr_url\", \"branch\": \"$branch_name\"}"
+      export pr_url branch_name
+      "$AMPLIFIER_PYTHON" - <<'PY'
+      import json
+      import os
+
+      print(json.dumps({
+          "pr_created": True,
+          "pr_url": os.environ["pr_url"],
+          "branch": os.environ["branch_name"],
+      }))
+      PY
     output: "pr_info"
     parse_json: true
     timeout: 300
