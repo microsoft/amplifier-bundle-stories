@@ -27,7 +27,7 @@ dependencies:
 
 name: "session-to-case-study"
 description: "Convert completed Amplifier session files into compelling case studies in Word format"
-version: "1.1.0"
+version: "1.2.0"
 author: "amplifier-stories"
 tags: ["case-study", "documentation", "storytelling", "session-analysis"]
 
@@ -35,6 +35,8 @@ tags: ["case-study", "documentation", "storytelling", "session-analysis"]
 # Takes an events.jsonl file and produces a professional Word document
 #
 # CHANGELOG:
+# v1.2.0 - Pass session paths, output names, and strategy content through
+#          `env:` so none of them are parsed as bash source.
 # v1.1.0 - Declare schema_version 2 + a dependency manifest so this recipe runs
 #          from ANY session bundle, not only one that already carries its
 #          agents. No agent reference was changed.
@@ -263,13 +265,15 @@ steps:
   - id: "finalize"
     type: "bash"
     condition: "{{strategy_plan.worthy}}"
+    env:
+      SESSION_FILE: "{{session_file}}"
+      OUTPUT_NAME: "{{output_name}}"
     command: |
+      set -euo pipefail
+
       # Construct the file path
-      SESSION_FILE="{{session_file}}"
-      OUTPUT_NAME="{{output_name}}"
-      
       # Extract session ID from file path
-      SESSION_ID=$(basename "$SESSION_FILE" .jsonl)
+      SESSION_ID=$(basename -- "$SESSION_FILE" .jsonl)
       
       # Determine output filename
       if [ -n "$OUTPUT_NAME" ] && [ "$OUTPUT_NAME" != "null" ] && [ "$OUTPUT_NAME" != "" ]; then
@@ -287,7 +291,7 @@ steps:
       fi
       
       # Get file size and show summary
-      FILE_SIZE=$(ls -lh "$FILE_PATH" | awk '{print $5}')
+      FILE_SIZE=$(ls -lh -- "$FILE_PATH" | awk '{print $5}')
       echo "✅ Case study generated successfully!"
       echo " File: $FILE_PATH"
       echo " Size: $FILE_SIZE"
@@ -325,19 +329,17 @@ steps:
   - id: "not-worthy-report"
     type: "bash"
     condition: "not {{strategy_plan.worthy}}"
+    env:
+      STRATEGY_PLAN: "{{strategy_plan}}"
     command: |
+      set -euo pipefail
+
       echo "ℹ️  Session Analysis Complete"
       echo ""
       echo " This session was analyzed but does not meet case study criteria."
       echo ""
       echo "Strategy Assessment:"
-      # Quoted heredoc, NOT echo "...": the strategy payload is JSON and
-      # contains double quotes and parentheses, which break an interpolated
-      # `echo "..."` with a shell syntax error. Same pattern weekly-digest.yaml
-      # uses for its digest body.
-      cat <<'STRATEGY_EOF'
-      {{strategy_plan}}
-      STRATEGY_EOF
+      printf '%s\n' "$STRATEGY_PLAN"
       echo ""
       echo " Tip: Case-study worthy sessions typically have:"
       echo "   • 10+ tool calls"
