@@ -1,0 +1,74 @@
+// This recipe turns a git version tag into a complete set of release documents — changelogs, notes, upgrade guides, and announcements.
+digraph git_tag_to_changelog {
+    rankdir=TB
+    fontname="Helvetica"
+    fontsize=12
+    label="Release Documentation Builder\nFrom a git tag, create changelogs, release notes, guides, and announcements"
+    labelloc=t
+    labeljust=c
+    compound=true
+    nodesep=0.6
+    ranksep=0.7
+    bgcolor="white"
+    source_hash="b4460204d57c76401171f769c100f4a94f8638968607e19c4c7dd0f2f81748dd"
+
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded"]
+    edge [fontname="Helvetica", fontsize=9]
+
+    start [label="Start", shape=oval, fillcolor="#e0e0e0"]
+    done  [label="Done!", shape=oval, fillcolor="#e0e0e0"]
+
+    step_detect_tag [label="Find the Release Tag\n\"Which version is this?\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  cd '{{repo_path}}'  tag_name='{{tag_name}}'  # Validate tag_name was provided if "]
+    step_extract_commits [label="Gather All Changes\n\"What happened since last time?\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  cd '{{repo_path}}'  # Get commits with full details git log {{tag_info.commit_ran"]
+    step_analyze_commits [label="Review the Changes\n\"What's important?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:zen-architect"]
+    cond_step_analyze_breaking_changes [label="Breaking changes\nfound?", shape=diamond, fillcolor="#fff9c4"]
+    step_analyze_breaking_changes [label="Investigate Breaking Changes\n\"What might affect users?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:explorer"]
+    step_generate_changelog [label="Write the Changelog\n\"Organize every change\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:integration-specialist"]
+    step_generate_release_notes [label="Write Release Notes\n\"Summarize for everyone\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:zen-architect"]
+    cond_step_generate_migration_guide [label="Breaking changes\nfound?", shape=diamond, fillcolor="#fff9c4"]
+    step_generate_migration_guide [label="Write a Migration Guide\n\"How to upgrade safely\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:integration-specialist"]
+    cond_step_generate_blog_post [label="Blog post\nrequested?", shape=diamond, fillcolor="#fff9c4"]
+    step_generate_blog_post [label="Write a Blog Post\n\"Announce the release\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:zen-architect"]
+    cond_step_generate_social_media [label="Social media\nrequested?", shape=diamond, fillcolor="#fff9c4"]
+    step_generate_social_media [label="Write Social Media Posts\n\"Spread the word\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="foundation:zen-architect"]
+    step_save_files [label="Save All Documents\n\"Write everything to disk\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  output_dir='{{output_dir}}' tag_name='{{tag_info.tag_name}}'  # Create output dir"]
+    cond_step_create_pr [label="Pull request\nneeded?", shape=diamond, fillcolor="#fff9c4"]
+    step_create_pr [label="Open a Pull Request\n\"Submit for team review\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="set -euo pipefail  cd '{{repo_path}}'  tag_name='{{tag_info.tag_name}}' branch_name='{{branch_name}}"]
+
+    start -> step_detect_tag
+    step_detect_tag -> step_extract_commits
+    step_extract_commits -> step_analyze_commits
+    step_analyze_commits -> cond_step_analyze_breaking_changes
+    cond_step_analyze_breaking_changes -> step_analyze_breaking_changes [label="commit_analysis.statistic"]
+    step_analyze_commits -> step_generate_changelog
+    step_generate_changelog -> step_generate_release_notes
+    step_generate_release_notes -> cond_step_generate_migration_guide
+    cond_step_generate_migration_guide -> step_generate_migration_guide [label="commit_analysis.statistic"]
+    step_generate_release_notes -> cond_step_generate_blog_post
+    cond_step_generate_blog_post -> step_generate_blog_post [label="include_blog_post == true"]
+    step_generate_release_notes -> cond_step_generate_social_media
+    cond_step_generate_social_media -> step_generate_social_media [label="include_social_media == t"]
+    step_generate_release_notes -> step_save_files
+    step_save_files -> cond_step_create_pr
+    cond_step_create_pr -> step_create_pr [label="skip_pr == false"]
+    cond_step_analyze_breaking_changes -> step_generate_changelog [label="skip", style=dashed]
+    cond_step_generate_migration_guide -> step_save_files [label="skip", style=dashed]
+    cond_step_generate_blog_post -> step_save_files [label="skip", style=dashed]
+    cond_step_generate_social_media -> step_save_files [label="skip", style=dashed]
+    cond_step_create_pr -> done [label="skip", style=dashed]
+    step_save_files -> done
+
+    subgraph cluster_legend {
+        label="Legend\n\"What the shapes mean\""
+        style="filled,rounded"
+        fillcolor="white"
+        color="#cccccc"
+        fontsize=10
+        node [shape=box, fontsize=9, width=1.6]
+        leg_bash [label="Automated Script", shape=box, fillcolor="#bbdefb"]
+        leg_agent [label="AI-Powered Step", shape=box, fillcolor="#c8e6c9"]
+        leg_cond [label="Decision Point", shape=diamond, fillcolor="#fff9c4"]
+        leg_start [label="Start / End", shape=oval, fillcolor="#e0e0e0"]
+        leg_bash -> leg_agent -> leg_cond -> leg_start [style=invis]
+    }
+}
