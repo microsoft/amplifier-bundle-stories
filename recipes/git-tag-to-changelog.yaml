@@ -899,21 +899,21 @@ steps:
       printf '%s\n' "$RELEASE_NOTES" > "$output_dir/RELEASE-NOTES-${tag_file}.md"
       
       # Save migration guide if exists
-      {% if commit_analysis.statistics.has_breaking_changes %}
-      printf '%s\n' "$MIGRATION_GUIDE" > "$output_dir/MIGRATION-${tag_file}.md"
-      {% endif %}
+      if [ "$HAS_BREAKING_CHANGES" = 'true' ]; then
+        printf '%s\n' "$MIGRATION_GUIDE" > "$output_dir/MIGRATION-${tag_file}.md"
+      fi
       
       # Save blog post if generated
-      {% if include_blog_post %}
-      printf '%s\n' "$BLOG_POST" > "$output_dir/BLOG-POST-${tag_file}.md"
-      {% endif %}
+      if [ "$INCLUDE_BLOG_POST" = 'true' ]; then
+        printf '%s\n' "$BLOG_POST" > "$output_dir/BLOG-POST-${tag_file}.md"
+      fi
       
       # Save social media content if generated
-      {% if include_social_media %}
-      printf '%s\n' "$SOCIAL_TWITTER" > "$output_dir/social/twitter.txt"
-      printf '%s\n' "$SOCIAL_LINKEDIN" > "$output_dir/social/linkedin.txt"
-      printf '%s\n' "$SOCIAL_MASTODON" > "$output_dir/social/mastodon.txt"
-      {% endif %}
+      if [ "$INCLUDE_SOCIAL_MEDIA" = 'true' ]; then
+        printf '%s\n' "$SOCIAL_TWITTER" > "$output_dir/social/twitter.txt"
+        printf '%s\n' "$SOCIAL_LINKEDIN" > "$output_dir/social/linkedin.txt"
+        printf '%s\n' "$SOCIAL_MASTODON" > "$output_dir/social/mastodon.txt"
+      fi
       
       # Create summary file
       export tag_file

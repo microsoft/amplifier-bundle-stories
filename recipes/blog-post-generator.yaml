@@ -715,6 +715,7 @@ steps:
       BLOG_POST: "{{blog_post}}"
       SOCIAL_MEDIA: "{{social_media}}"
       TECHNICAL_APPENDIX_PATH: "{{technical_appendix_path}}"
+      INCLUDE_TECHNICAL_APPENDIX: "{{include_technical_appendix}}"
     command: |
       set -euo pipefail
       
@@ -746,8 +747,9 @@ steps:
       echo " Files created:"
       echo "   - Blog post: $BLOG_FILE"
       echo "   - Social media: $SOCIAL_FILE"
-      {% if include_technical_appendix %}printf '   - Technical appendix: %s\n' "$TECHNICAL_APPENDIX_PATH"
-      {% endif %}
+      if [ "$INCLUDE_TECHNICAL_APPENDIX" = 'true' ]; then
+        printf '   - Technical appendix: %s\n' "$TECHNICAL_APPENDIX_PATH"
+      fi
       echo ""
       
       # Output file paths for next step
@@ -775,6 +777,7 @@ steps:
       BLOG_FILE: "{{file_paths.blog_file}}"
       SOCIAL_FILE: "{{file_paths.social_file}}"
       TECHNICAL_APPENDIX_PATH: "{{technical_appendix_path}}"
+      INCLUDE_TECHNICAL_APPENDIX: "{{include_technical_appendix}}"
     command: |
       set -euo pipefail
 
@@ -813,8 +816,9 @@ steps:
       echo " Files:"
       echo "   - Blog: $BLOG_FILE"
       echo "   - Social: $SOCIAL_FILE"
-      {% if include_technical_appendix %}printf '   - Technical: %s\n' "$TECHNICAL_APPENDIX_PATH"
-      {% endif %}
+      if [ "$INCLUDE_TECHNICAL_APPENDIX" = 'true' ]; then
+        printf '   - Technical: %s\n' "$TECHNICAL_APPENDIX_PATH"
+      fi
       echo ""
     output: "completion_message"
     timeout: 60
