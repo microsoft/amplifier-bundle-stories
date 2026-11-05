@@ -1,0 +1,56 @@
+// Turns a completed work session into a polished case study document — or explains why it wasn't the right fit.
+digraph session_to_case_study {
+    rankdir=TB
+    fontname="Helvetica"
+    fontsize=12
+    label="Session to Case Study\nReads a finished work session, decides if it's story-worthy, and writes it up as a polished document"
+    labelloc=t
+    labeljust=c
+    compound=true
+    nodesep=0.6
+    ranksep=0.7
+    bgcolor="white"
+    source_hash="23f473283620e8a7a4782eaa5cb0da6f4880b80fa59a32858c6cd157068a0e4f"
+
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded"]
+    edge [fontname="Helvetica", fontsize=9]
+
+    start [label="Start", shape=oval, fillcolor="#e0e0e0"]
+    done  [label="Done!", shape=oval, fillcolor="#e0e0e0"]
+
+    step_research [label="Read the Session\n\"What happened here?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="story-researcher"]
+    step_strategy [label="Evaluate the Story\n\"Is this worth telling?\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="content-strategist"]
+    cond_step_writing [label="Worth writing up?", shape=diamond, fillcolor="#fff9c4"]
+    step_writing [label="Write the Case Study\n\"Tell the story\"", shape=box, fillcolor="#c8e6c9", style="filled,rounded", tooltip="case-study-writer"]
+    cond_step_finalize [label="Ready to save?", shape=diamond, fillcolor="#fff9c4"]
+    step_finalize [label="Save the Document\n\"Package it up\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="# Construct the file path SESSION_FILE='{{session_file}}' OUTPUT_NAME='{{output_name}}'  # Extract s"]
+    cond_step_not_worthy_report [label="Not the right fit?", shape=diamond, fillcolor="#fff9c4"]
+    step_not_worthy_report [label="Report: Not a Fit\n\"Explain why we skipped it\"", shape=box, fillcolor="#bbdefb", style="filled,rounded", tooltip="echo 'ℹ️  Session Analysis Complete' echo '' echo ' This session was analyzed but does not meet case"]
+
+    start -> step_research
+    step_research -> step_strategy
+    step_strategy -> cond_step_writing
+    cond_step_writing -> step_writing [label="strategy_plan contains 'w"]
+    step_strategy -> cond_step_finalize
+    cond_step_finalize -> step_finalize [label="strategy_plan contains 'w"]
+    step_strategy -> cond_step_not_worthy_report
+    cond_step_not_worthy_report -> step_not_worthy_report [label="strategy_plan contains 'w"]
+    cond_step_writing -> done [label="skip", style=dashed]
+    cond_step_finalize -> done [label="skip", style=dashed]
+    cond_step_not_worthy_report -> done [label="skip", style=dashed]
+    step_strategy -> done
+
+    subgraph cluster_legend {
+        label="Legend\n\"What do the shapes mean?\""
+        style="filled,rounded"
+        fillcolor="white"
+        color="#cccccc"
+        fontsize=10
+        node [shape=box, fontsize=9, width=1.6]
+        leg_bash [label="Script Step", shape=box, fillcolor="#bbdefb"]
+        leg_agent [label="AI Agent Step", shape=box, fillcolor="#c8e6c9"]
+        leg_cond [label="Condition", shape=diamond, fillcolor="#fff9c4"]
+        leg_start [label="Start / End", shape=oval, fillcolor="#e0e0e0"]
+        leg_bash -> leg_agent -> leg_cond -> leg_start [style=invis]
+    }
+}

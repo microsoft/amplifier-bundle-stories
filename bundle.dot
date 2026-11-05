@@ -1,0 +1,95 @@
+// Stories bundle: a team of AI writing specialists that research, draft, and adapt
+// content across formats — case studies, executive briefs, release notes, and more.
+
+digraph stories {
+    rankdir=LR
+    fontname="Helvetica"
+    fontsize=12
+    label="Stories — Content Creation Team\nAI writers and researchers for narratives, case studies & communications"
+    labelloc=t
+    labeljust=c
+    nodesep=0.6
+    ranksep=0.7
+    bgcolor="white"
+    source_hash="bb20672191e7c5bd23cacfffad13c16d862229b1e0fc70675e76399eeb25e11a"
+
+    node [fontname="Helvetica", fontsize=11, style="filled,rounded"]
+    edge [fontname="Helvetica", fontsize=9]
+
+    root_stories [label="Stories v1.0.0\nContent Creation Team\n0 tools · 0 agents\n~3578 tok aggregate", shape=box, fillcolor="#80cbc4", style="filled,rounded,bold", penwidth=2]
+
+    subgraph cluster_behaviors {
+        label="Writing Team"
+        style="filled"
+        fillcolor="#f9f9f9"
+        color="#999999"
+
+        beh_stories_behavior [label="Content Writing Team\nstories-behavior\n~528 tok", shape=box, fillcolor="#e0f2f1", style="filled,rounded"]
+    }
+
+    subgraph cluster_agents {
+        label="Specialist Writers & Researchers"
+        style="filled"
+        fillcolor="#f9f9f9"
+        color="#999999"
+
+        agt_case_study_writer [label="Case Study Writer\nTurns projects into success stories\n~26 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_community_manager [label="Community Manager\nEngages audiences and communities\n~27 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_content_adapter [label="Content Adapter\nReshapes content for different channels\n~28 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_content_strategist [label="Content Strategist\nPlans themes and messaging\n~35 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_data_analyst [label="Data Analyst\nFinds metrics and insights for stories\n~24 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_executive_briefer [label="Executive Briefer\nSummarizes key points for leadership\n~26 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_marketing_writer [label="Marketing Writer\nCrafts promotional and brand content\n~25 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_release_manager [label="Release Manager\nWrites release notes and announcements\n~32 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_story_researcher [label="Story Researcher\nGathers facts and background material\n~32 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_storyteller [label="Storyteller\nLeads narrative creation\n~20 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+        agt_technical_writer [label="Technical Writer\nExplains complex topics clearly\n~32 tok desc", shape=box, fillcolor="#c8e6c9", style="filled,rounded"]
+    }
+
+    subgraph cluster_context {
+        label="Reference Documents"
+        style="filled"
+        fillcolor="#f9f9f9"
+        color="#999999"
+
+        ctx_storyteller_instructions_md [label="Storytelling Playbook\nstoryteller-instructions.md\n~3041 tok", shape=box, fillcolor="#e1bee7", style="filled,rounded"]
+    }
+
+    subgraph cluster_legend {
+        label="Legend"
+        style="filled"
+        fillcolor="white"
+        color="#cccccc"
+        fontsize=9
+
+        leg_root [label="root bundle", shape=box, fillcolor="#80cbc4", style="filled,rounded,bold", fontsize=9]
+        leg_behavior [label="behavior", shape=box, fillcolor="#e0f2f1", style="filled,rounded", fontsize=9]
+        leg_agent [label="agent", shape=box, fillcolor="#c8e6c9", style="filled,rounded", fontsize=9]
+        leg_module [label="module", shape=box, fillcolor="#bbdefb", style="filled,rounded", fontsize=9]
+        leg_provider [label="provider", shape=box, fillcolor="#e0e0e0", style="filled,rounded", fontsize=9]
+        leg_context [label="context", shape=box, fillcolor="#e1bee7", style="filled,rounded", fontsize=9]
+        leg_standalone [label="standalone", shape=box, fillcolor="#80cbc4", style="filled,rounded", fontsize=9]
+        leg_experiment [label="experiment", shape=box, fillcolor="#e1bee7", style="filled,rounded", fontsize=9]
+        leg_ext_cost [label="ext+cost", shape=box, fillcolor="#80cbc4", style="dashed", color="red", penwidth=2, fontsize=9]
+        leg_ext_muted [label="ext+no-cost", shape=box, fillcolor="#f5f5f5", style="dashed", fontsize=9]
+    }
+
+    disclaimer [label="Token estimates: ~4 chars/token\nSolid border = local (counted)\nDashed + red = external, hidden cost (not counted)\nDashed + muted = external, no cost\nExcludes: sub-session costs, runtime-dynamic", shape=note, fillcolor="#eceff1", style="filled", fontsize=9]
+
+    ext_githttps___github_com_microsoft_amplifier_foundation_main [label="Amplifier Foundation\nShared base capabilities\n(external, cost)", shape=box, fillcolor="#80cbc4", style="dashed", color="red", penwidth=2]
+
+    root_stories -> ext_githttps___github_com_microsoft_amplifier_foundation_main [style=dashed]
+    root_stories -> beh_stories_behavior [label="composes"]
+    beh_stories_behavior -> agt_storyteller [label="owns"]
+    beh_stories_behavior -> agt_story_researcher [label="owns"]
+    beh_stories_behavior -> agt_content_strategist [label="owns"]
+    beh_stories_behavior -> agt_technical_writer [label="owns"]
+    beh_stories_behavior -> agt_marketing_writer [label="owns"]
+    beh_stories_behavior -> agt_executive_briefer [label="owns"]
+    beh_stories_behavior -> agt_community_manager [label="owns"]
+    beh_stories_behavior -> agt_release_manager [label="owns"]
+    beh_stories_behavior -> agt_case_study_writer [label="owns"]
+    beh_stories_behavior -> agt_data_analyst [label="owns"]
+    beh_stories_behavior -> agt_content_adapter [label="owns"]
+    root_stories -> ctx_storyteller_instructions_md [style=dotted, color=purple]
+}
