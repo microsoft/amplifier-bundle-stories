@@ -131,7 +131,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-          uv run --no-project --python ${{ matrix.python-version }} --with 'playwright==1.58.2' python -m playwright install --with-deps chrome
+          uv run --no-project --python ${{ matrix.python-version }} --with 'playwright==1.58.0' python -m playwright install --with-deps chrome
           echo "STORIES_CHROMIUM=$(command -v google-chrome)" >> "$GITHUB_ENV"
           google-chrome --version
           ffmpeg -version
@@ -143,7 +143,7 @@ jobs:
           --with 'pytest>=8.0'
           --with 'PyYAML>=6.0'
           --with 'pytest-asyncio>=0.24'
-          --with 'playwright==1.58.2'
+          --with 'playwright==1.58.0'
           --with 'amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384'
           --with 'amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate'
           pytest tests/ -q --tb=short
