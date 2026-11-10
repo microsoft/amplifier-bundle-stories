@@ -153,6 +153,32 @@ Start with this structure:
 </html>
 ```
 
+### Video in HTML decks
+
+When including supplied video in a self-contained deck, embed its actual bytes,
+not a filesystem path or hosted player. Keep an identical, clearly named video
+file alongside the delivered HTML for separate sharing. Do not transcode or
+regenerate it merely to embed it.
+
+```html
+<div class="slide">
+    <h2 class="headline">Demonstration</h2>
+    <video controls playsinline preload="metadata" aria-label="Demonstration"
+           style="max-width:100%;max-height:70vh"
+           src="data:video/mp4;base64,REPLACE_WITH_ACTUAL_BASE64_BYTES">
+        This browser cannot play the video. Use the separately supplied MP4.
+    </video>
+</div>
+```
+
+Replace the placeholder programmatically with base64 of the supplied MP4 before
+delivery; never invent or hand-copy media bytes. Embed any poster and other images
+too. If the caller chooses referenced video instead, use a relative path and
+deliver that file with the HTML; do not call that a single self-contained file.
+For example, deliver `Project_YYYY-MM-DD_presentation.html` and
+`Project_YYYY-MM-DD_video.mp4`. The navigation below leaves native media controls
+alone and pauses clips on departure without resetting their position.
+
 ### Navigation JavaScript
 
 Always include this for keyboard/click/dot/**touch** navigation:
@@ -162,8 +188,11 @@ const slides = document.querySelectorAll('.slide');
 let currentSlide = 0;
 
 function showSlide(n) {
+    const destination = (n + slides.length) % slides.length;
+    if (destination === currentSlide) return;
+    slides[currentSlide].querySelectorAll('video,audio').forEach(media => media.pause());
     slides[currentSlide].classList.remove('active');
-    currentSlide = (n + slides.length) % slides.length;
+    currentSlide = destination;
     slides[currentSlide].classList.add('active');
     updateNav();
 }
@@ -175,42 +204,67 @@ function updateNav() {
     slides.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
-        dot.onclick = () => showSlide(i);
+        dot.onclick = (e) => {
+            e.stopPropagation(); // updateNav replaces this dot before the click can bubble.
+            showSlide(i);
+        };
         nav.appendChild(dot);
     });
     counter.textContent = `${currentSlide + 1} / ${slides.length}`;
 }
 
+// Leave native media controls and other interactive elements alone.
+function isInteractive(target) {
+    return target instanceof Element &&
+        !!target.closest('video,audio,button,a,input,textarea,select,summary,[contenteditable]:not([contenteditable="false"]),[role="button"],[role="slider"],.nav');
+}
+
+// A late play request must not start hidden media after leaving its slide.
+document.addEventListener('play', (e) => {
+    if (e.target instanceof HTMLMediaElement &&
+        e.target.closest('.slide') !== slides[currentSlide]) e.target.pause();
+}, true);
+
 // Keyboard navigation
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ') showSlide(currentSlide + 1);
-    if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || isInteractive(e.target)) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        showSlide(currentSlide + 1);
+    }
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        showSlide(currentSlide - 1);
+    }
 });
 
 // Click navigation
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav')) return;
+    if (e.defaultPrevented || isInteractive(e.target)) return;
     if (e.clientX > window.innerWidth / 2) showSlide(currentSlide + 1);
     else showSlide(currentSlide - 1);
 });
 
 // Touch/swipe navigation (REQUIRED for mobile)
-let touchStartX = 0;
-let touchEndX = 0;
+let touchStartX = null;
 const SWIPE_THRESHOLD = 50;
 
 document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
+    touchStartX = !isInteractive(e.target) && e.touches.length === 1
+        ? e.changedTouches[0].screenX : null;
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchStartX - touchEndX;
+    const start = touchStartX;
+    touchStartX = null;
+    if (start === null || isInteractive(e.target)) return;
+    const diff = start - e.changedTouches[0].screenX;
     if (Math.abs(diff) > SWIPE_THRESHOLD) {
         if (diff > 0) showSlide(currentSlide + 1);
         else showSlide(currentSlide - 1);
     }
 }, { passive: true });
+document.addEventListener('touchcancel', () => { touchStartX = null; }, { passive: true });
 
 updateNav();
 ```
@@ -310,6 +364,9 @@ Before presenting to user, verify ALL items in both sections:
 
 ### Visual & Technical
 
+- [ ] For video decks, embedded bytes match the separately delivered video; referenced delivery includes the relative media files.
+- [ ] Open a copied/downloaded deck offline (with its media folder for referenced delivery); verify images, real video playback, sound and seeking. Record browser or codec limits.
+- [ ] Video controls do not navigate slides; leaving pauses the clip and returning preserves its position. Local playback does not establish SharePoint playback; verify the intended delivery route separately.
 - [ ] Navigation works (arrows, click, dots, **swipe on mobile**)
 - [ ] Slide counter updates correctly
 - [ ] No horizontal scrolling on any slide
