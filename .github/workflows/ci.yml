@@ -73,7 +73,7 @@ jobs:
         run: uvx ruff@0.16.6 check --isolated --select E4,E7,E9,F .
 
   # ───────────────────────────────────────────────────────────────────────────
-  # Tests -- the repo's real suite under tests/, 74 tests. NOT an import smoke.
+  # Tests -- the repo's real suite under tests/. NOT an import smoke.
   #
   #   tests/test_recipes_schema_v2.py     -- every shipped recipe that names an
   #                                          agent must declare schema_version 2
@@ -125,6 +125,17 @@ jobs:
 
       - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
 
+      # Use Chrome's MP4/AAC codecs, not a Chromium build lacking those codecs.
+      # The browser tests generate their own small clip; no private media is used.
+      - name: Install media test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          uv run --no-project --python ${{ matrix.python-version }} --with 'playwright==1.58.2' python -m playwright install --with-deps chrome
+          echo "STORIES_CHROMIUM=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          google-chrome --version
+          ffmpeg -version
+
       - name: Run tests
         run: >
           uv run --no-project
@@ -132,6 +143,7 @@ jobs:
           --with 'pytest>=8.0'
           --with 'PyYAML>=6.0'
           --with 'pytest-asyncio>=0.24'
+          --with 'playwright==1.58.2'
           --with 'amplifier-foundation @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384'
           --with 'amplifier-module-tool-delegate @ git+https://github.com/microsoft/amplifier-foundation@5f0f04b976f645fbc3b40e1f0acd6b4442ac6384#subdirectory=modules/tool-delegate'
           pytest tests/ -q --tb=short
