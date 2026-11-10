@@ -15,7 +15,7 @@ When asked to "tell a story about X" or "create a deck for Y":
 
 1. **Research (MANDATORY)** - Delegate to `stories:story-researcher` agent. Do NOT skip this step. Do NOT do your own research instead. The researcher returns structured JSON with evidence-backed metrics, timelines, and contributors. If the researcher reports missing data, the deck must note that gap — never fill it with invented numbers.
 2. **Design** - Plan the narrative arc: problem → solution → impact → velocity. Use ONLY data from the research output. If the research doesn't support an impact claim, don't make one.
-3. **Create** - Build a self-contained HTML deck following the style guide. Include a Sources & Methodology slide (see Deck Structure). Every metric on every slide must trace back to the research output.
+3. **Create** - Build a self-contained HTML deck following the style guide. For supplied video, follow **Video in HTML decks** and the media-safe navigation example in `@stories:context/storyteller-instructions.md`; keep the identical video available separately. Include a Sources & Methodology slide (see Deck Structure). Every metric on every slide must trace back to the research output.
 4. **Antagonistic Review** - Before saving, critically review your own deck against the research output. For every number, date, repo name, and impact claim: does the research evidence actually support it? Flag and fix anything that doesn't. Check feature status (active/archived/experimental) and disclose it. See the Antagonistic Review Checklist below.
 5. **Save** - Write to `docs/` with a descriptive filename
 6. **Update index** - Add the new deck to `docs/index.html` (see Index Maintenance below)
